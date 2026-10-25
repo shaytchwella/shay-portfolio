@@ -1,10 +1,10 @@
-/* ===== Design variables (from the Figma frame "Desktop - 2") ===== */
+/* ===== Design variables (from the Figma frame "Desktop - 3") ===== */
 :root {
   /* Colors */
   --color-page: #ffffff;      /* white background */
   --color-panel: #fef7ea;     /* cream fill of the panel and the strip */
   --color-border: #000000;    /* black outlines */
-  --color-text: #ff4a4a;      /* red "COMING SOON" */
+  --color-text: #f14b3f;      /* red "COMING SOON" */
   --color-muted: #b8b8b8;     /* gray labels in the strip */
   --color-strong: #000000;    /* black "MY PROJECTS" */
 
@@ -12,20 +12,20 @@
   --font-display: "AlfaBravo", Georgia, serif;
   --font-label: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --size-display: 20px;
-  --size-label: 20px;
+  --size-label: 18px;
 
   /* Spacing and sizes */
   --border-width: 2px;
   --strip-width: 110px;
-  --label-right: 17px;        /* gap between the labels and the strip's right border */
+  --label-right: 20px;        /* gap between the labels and the strip's right border */
   --name-top: 40px;           /* distance of the name from the top */
-  --projects-top: calc(50% - 145px); /* ends exactly at the middle of the screen */
-  --info-bottom: 185px;       /* "OCT 2026" block, distance from the bottom */
+  --projects-top: calc(50% - 118px); /* 394px from the top in the 1024px frame */
+  --info-bottom: 183px;       /* "OCT 2026" block, distance from the bottom */
   --links-bottom: 40px;       /* "ABOUT ME" block, distance from the bottom */
 
   /* Tilted message: center point inside the panel */
   --coming-soon-x: 342px;
-  --coming-soon-y: calc(50% - 288px); /* 224px from the top in the 1024px frame */
+  --coming-soon-y: calc(50% - 270px); /* 242px from the top in the 1024px frame */
   --coming-soon-tilt: -7deg;
 }
 
