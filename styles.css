@@ -10,20 +10,21 @@
   /* Fonts */
   --font-display: "AlfaBravo", Georgia, serif;
   --font-label: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --size-display: 32px;
+  --size-display: 20px;
   --size-label: 20px;
 
   /* Spacing and sizes */
   --border-width: 2px;
   --strip-width: 90px;
   --name-top: 40px;           /* distance of the name from the top */
+  --coming-soon-top: calc(50% - 301px); /* 211px from the top in the 1024px frame */
   --portfolio-top: 42.3%;     /* 433px out of the 1024px frame height */
 }
 
 /* ===== Font file ===== */
 @font-face {
   font-family: "AlfaBravo";
-  src: url("fonts/AlfaBravo-Regular.otf") format("opentype");
+  src: url("fonts/AlfaBravo-Normal.otf") format("opentype");
   font-weight: 400;
   font-display: swap;
 }
@@ -47,16 +48,19 @@ body {
 
 /* Large cream panel on the left, ends where the strip begins */
 .panel {
+  position: relative;
   width: calc(50% - var(--strip-width) / 2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
   background: var(--color-panel);
   border: var(--border-width) solid var(--color-border);
   border-right: none; /* the strip draws the line between them */
 }
 
+/* Centered across the panel, placed above the middle of the screen */
 .coming-soon {
+  position: absolute;
+  top: var(--coming-soon-top);
+  left: 50%;
+  transform: translateX(-50%);
   font-family: var(--font-display);
   font-weight: 400;
   font-size: var(--size-display);
