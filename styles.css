@@ -4,13 +4,13 @@
   --color-page: #ffffff;      /* white background */
   --color-panel: #fef7ea;     /* cream fill of the panel and the strip */
   --color-border: #000000;    /* black outlines */
-  --color-text: #000000;      /* "COMING SOON" */
+  --color-text: #ff4a4a;      /* red "COMING SOON" */
   --color-muted: #b8b8b8;     /* name and "PORTFOLIO" */
 
   /* Fonts */
   --font-display: "AlfaBravo", Georgia, serif;
   --font-label: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --size-display: 36px;
+  --size-display: 32px;
   --size-label: 20px;
 
   /* Spacing and sizes */
