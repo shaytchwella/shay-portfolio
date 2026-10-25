@@ -19,8 +19,8 @@
   --strip-width: 110px;
   --label-right: 17px;        /* gap between the labels and the strip's right border */
   --name-top: 40px;           /* distance of the name from the top */
-  --projects-top: calc(50% - 231px); /* 281px from the top in the 1024px frame */
-  --info-bottom: 170px;       /* "OCT 2026" block, distance from the bottom */
+  --projects-top: calc(50% - 145px); /* ends exactly at the middle of the screen */
+  --info-bottom: 185px;       /* "OCT 2026" block, distance from the bottom */
   --links-bottom: 40px;       /* "ABOUT ME" block, distance from the bottom */
 
   /* Tilted message: center point inside the panel */
