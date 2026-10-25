@@ -1,11 +1,12 @@
-/* ===== Design variables (from the Figma frame "Desktop - 1") ===== */
+/* ===== Design variables (from the Figma frame "Desktop - 2") ===== */
 :root {
   /* Colors */
   --color-page: #ffffff;      /* white background */
   --color-panel: #fef7ea;     /* cream fill of the panel and the strip */
   --color-border: #000000;    /* black outlines */
   --color-text: #ff4a4a;      /* red "COMING SOON" */
-  --color-muted: #b8b8b8;     /* name and "PORTFOLIO" */
+  --color-muted: #b8b8b8;     /* gray labels in the strip */
+  --color-strong: #000000;    /* black "MY PROJECTS" */
 
   /* Fonts */
   --font-display: "AlfaBravo", Georgia, serif;
@@ -15,10 +16,17 @@
 
   /* Spacing and sizes */
   --border-width: 2px;
-  --strip-width: 90px;
+  --strip-width: 110px;
+  --label-right: 17px;        /* gap between the labels and the strip's right border */
   --name-top: 40px;           /* distance of the name from the top */
-  --coming-soon-top: calc(50% - 301px); /* 211px from the top in the 1024px frame */
-  --portfolio-top: 42.3%;     /* 433px out of the 1024px frame height */
+  --projects-top: calc(50% - 231px); /* 281px from the top in the 1024px frame */
+  --info-bottom: 170px;       /* "OCT 2026" block, distance from the bottom */
+  --links-bottom: 40px;       /* "ABOUT ME" block, distance from the bottom */
+
+  /* Tilted message: center point inside the panel */
+  --coming-soon-x: 342px;
+  --coming-soon-y: calc(50% - 288px); /* 224px from the top in the 1024px frame */
+  --coming-soon-tilt: -7deg;
 }
 
 /* ===== Font file ===== */
@@ -55,12 +63,12 @@ body {
   border-right: none; /* the strip draws the line between them */
 }
 
-/* Centered across the panel, placed above the middle of the screen */
+/* Tilted message, placed by its center point */
 .coming-soon {
   position: absolute;
-  top: var(--coming-soon-top);
-  left: 50%;
-  transform: translateX(-50%);
+  top: var(--coming-soon-y);
+  left: var(--coming-soon-x);
+  transform: translate(-50%, -50%) rotate(var(--coming-soon-tilt));
   font-family: var(--font-display);
   font-weight: 400;
   font-size: var(--size-display);
@@ -78,11 +86,11 @@ body {
   border: var(--border-width) solid var(--color-border);
 }
 
-/* Vertical labels in the strip, read top to bottom */
+/* Vertical labels in the strip, read top to bottom.
+   Extra lines stack to the left. */
 .strip-label {
   position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  right: var(--label-right);
   writing-mode: vertical-rl;
   font-family: var(--font-label);
   font-weight: 700;
@@ -96,6 +104,17 @@ body {
   top: var(--name-top);
 }
 
-.strip-label--portfolio {
-  top: var(--portfolio-top);
+.strip-label--projects {
+  top: var(--projects-top);
+  color: var(--color-strong);
+}
+
+.strip-label--info {
+  bottom: var(--info-bottom);
+}
+
+/* Lines end together at the bottom */
+.strip-label--links {
+  bottom: var(--links-bottom);
+  text-align: end;
 }
