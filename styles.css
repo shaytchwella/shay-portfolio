@@ -1,4 +1,4 @@
-/* ===== Design variables (from the Figma frame "Desktop - 3") ===== */
+/* ===== Design variables (from the Figma frame "Desktop - 7") ===== */
 :root {
   /* Colors */
   --color-page: #ffffff;      /* white background */
@@ -12,21 +12,21 @@
   --font-display: "AlfaBravo", Georgia, serif;
   --font-label: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --size-display: 20px;
-  --size-label: 18px;
+  --size-label: 16px;
 
   /* Spacing and sizes */
   --border-width: 2px;
-  --strip-width: 110px;
-  --label-right: 20px;        /* gap between the labels and the strip's right border */
+  --strip-width: 100px;
+  --gap: 15px;                /* white space between the panel and the strip */
+  --label-right: 18px;        /* gap between the labels and the strip's right border */
   --name-top: 40px;           /* distance of the name from the top */
-  --projects-top: calc(50% - 118px); /* 394px from the top in the 1024px frame */
-  --info-bottom: 183px;       /* "OCT 2026" block, distance from the bottom */
+  --projects-top: calc(50% - 111px); /* 401px from the top in the 1024px frame */
+  --info-bottom: 196px;       /* "OCT 2026" block, distance from the bottom */
   --links-bottom: 40px;       /* "ABOUT ME" block, distance from the bottom */
 
-  /* Tilted message: center point inside the panel */
-  --coming-soon-x: 342px;
+  /* Message: center point inside the panel */
+  --coming-soon-x: 343px;
   --coming-soon-y: calc(50% - 270px); /* 242px from the top in the 1024px frame */
-  --coming-soon-tilt: -7deg;
 }
 
 /* ===== Font file ===== */
@@ -50,25 +50,25 @@ body {
 /* ===== Layout: one screen, no scrolling ===== */
 .page {
   display: flex;
+  gap: var(--gap);
   height: 100vh;
   height: 100dvh;
 }
 
-/* Large cream panel on the left, ends where the strip begins */
+/* Large cream panel on the left, so the strip sits in the middle of the screen */
 .panel {
   position: relative;
-  width: calc(50% - var(--strip-width) / 2);
+  width: calc(50% - var(--strip-width) / 2 - var(--gap));
   background: var(--color-panel);
   border: var(--border-width) solid var(--color-border);
-  border-right: none; /* the strip draws the line between them */
 }
 
-/* Tilted message, placed by its center point */
+/* Message, placed by its center point */
 .coming-soon {
   position: absolute;
   top: var(--coming-soon-y);
   left: var(--coming-soon-x);
-  transform: translate(-50%, -50%) rotate(var(--coming-soon-tilt));
+  transform: translate(-50%, -50%);
   font-family: var(--font-display);
   font-weight: 400;
   font-size: var(--size-display);
