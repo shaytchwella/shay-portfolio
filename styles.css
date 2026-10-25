@@ -1,0 +1,97 @@
+/* ===== Design variables (from the Figma frame "Desktop - 1") ===== */
+:root {
+  /* Colors */
+  --color-page: #ffffff;      /* white background */
+  --color-panel: #fef7ea;     /* cream fill of the panel and the strip */
+  --color-border: #000000;    /* black outlines */
+  --color-text: #000000;      /* "COMING SOON" */
+  --color-muted: #b8b8b8;     /* name and "PORTFOLIO" */
+
+  /* Fonts */
+  --font-display: "AlfaBravo", Georgia, serif;
+  --font-label: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --size-display: 36px;
+  --size-label: 20px;
+
+  /* Spacing and sizes */
+  --border-width: 2px;
+  --strip-width: 90px;
+  --name-top: 40px;           /* distance of the name from the top */
+  --portfolio-top: 42.3%;     /* 433px out of the 1024px frame height */
+}
+
+/* ===== Font file ===== */
+@font-face {
+  font-family: "AlfaBravo";
+  src: url("fonts/AlfaBravo-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-display: swap;
+}
+
+/* ===== Base ===== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+body {
+  background: var(--color-page);
+}
+
+/* ===== Layout: one screen, no scrolling ===== */
+.page {
+  display: flex;
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* Large cream panel on the left, ends where the strip begins */
+.panel {
+  width: calc(50% - var(--strip-width) / 2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-panel);
+  border: var(--border-width) solid var(--color-border);
+  border-right: none; /* the strip draws the line between them */
+}
+
+.coming-soon {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: var(--size-display);
+  line-height: normal;
+  color: var(--color-text);
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Narrow strip in the middle of the screen */
+.strip {
+  position: relative;
+  width: var(--strip-width);
+  background: var(--color-panel);
+  border: var(--border-width) solid var(--color-border);
+}
+
+/* Vertical labels in the strip, read top to bottom */
+.strip-label {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  writing-mode: vertical-rl;
+  font-family: var(--font-label);
+  font-weight: 700;
+  font-size: var(--size-label);
+  line-height: normal;
+  color: var(--color-muted);
+  white-space: nowrap;
+}
+
+.strip-label--name {
+  top: var(--name-top);
+}
+
+.strip-label--portfolio {
+  top: var(--portfolio-top);
+}

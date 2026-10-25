@@ -1,0 +1,5 @@
+# macOS system files
+.DS_Store
+
+# Licensed font files: the desktop license does not allow sharing them
+fonts/*.otf
