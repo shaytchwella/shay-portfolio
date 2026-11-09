@@ -1,120 +1,138 @@
-/* ===== Design variables (from the Figma frame "Desktop - 7") ===== */
+/* ===== Design variables (from the Figma frame "Desktop - 35") ===== */
 :root {
   /* Colors */
   --color-page: #ffffff;      /* white background */
-  --color-panel: #fef7ea;     /* cream fill of the panel and the strip */
-  --color-border: #000000;    /* black outlines */
-  --color-text: #f14b3f;      /* red "COMING SOON" */
-  --color-muted: #b8b8b8;     /* gray labels in the strip */
-  --color-strong: #000000;    /* black "MY PROJECTS" */
+  --color-text: #000000;      /* all text */
 
   /* Fonts */
-  --font-display: "AlfaBravo", Georgia, serif;
-  --font-label: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --size-display: 20px;
-  --size-label: 16px;
+  --font-main: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --size-body: 15.5px;        /* projects and about text */
+  --size-label: 14px;         /* vertical labels */
+  --line-height-list: 22px;   /* one row of the projects table */
 
   /* Spacing and sizes */
-  --border-width: 2px;
-  --strip-width: 100px;
-  --gap: 15px;                /* white space between the panel and the strip */
-  --label-right: 18px;        /* gap between the labels and the strip's right border */
-  --name-top: 40px;           /* distance of the name from the top */
-  --projects-top: calc(50% - 111px); /* 401px from the top in the 1024px frame */
-  --info-bottom: 196px;       /* "OCT 2026" block, distance from the bottom */
-  --links-bottom: 40px;       /* "ABOUT ME" block, distance from the bottom */
-
-  /* Message: center point inside the panel */
-  --coming-soon-x: 343px;
-  --coming-soon-y: calc(50% - 270px); /* 242px from the top in the 1024px frame */
-}
-
-/* ===== Font file ===== */
-@font-face {
-  font-family: "AlfaBravo";
-  src: url("fonts/AlfaBravo-Normal.otf") format("opentype");
-  font-weight: 400;
-  font-display: swap;
+  --edge: 15px;               /* distance of the left content from the screen edge */
+  --label-edge: 20px;         /* distance of the top and bottom labels from the screen edge */
+  --index-bottom: 126px;      /* "INDEX", distance from the bottom */
+  --bio-top: calc(100% - 175px); /* about text starts 175px above the bottom */
+  --bio-width: 328px;
+  --lines-top: 82.2px;        /* first red line, under project 1 */
+  --lines-width: 670px;
+  --band-width: 100px;
+  --band-offset: 71px;        /* distance of each band's center from the screen center */
 }
 
 /* ===== Base ===== */
 * {
   box-sizing: border-box;
   margin: 0;
+  padding: 0;
 }
 
 body {
   background: var(--color-page);
+  color: var(--color-text);
+  font-family: var(--font-main);
 }
 
 /* ===== Layout: one screen, no scrolling ===== */
 .page {
-  display: flex;
-  gap: var(--gap);
+  position: relative;
   height: 100vh;
   height: 100dvh;
+  overflow: hidden;
 }
 
-/* Large cream panel on the left, so the strip sits in the middle of the screen */
-.panel {
-  position: relative;
-  width: calc(50% - var(--strip-width) / 2 - var(--gap));
-  background: var(--color-panel);
-  border: var(--border-width) solid var(--color-border);
-}
-
-/* Message, placed by its center point */
-.coming-soon {
+/* ===== Pink bands ===== */
+/* Each band is a 100px wide column, full height.
+   The SVG is drawn lying down, so it is turned upright here. */
+.band {
   position: absolute;
-  top: var(--coming-soon-y);
-  left: var(--coming-soon-x);
-  transform: translate(-50%, -50%);
-  font-family: var(--font-display);
+  top: 0;
+  width: var(--band-width);
+  height: 100%;
+}
+
+.band--left {
+  left: calc(50% - var(--band-offset) - var(--band-width) / 2);
+}
+
+.band--right {
+  left: calc(50% + var(--band-offset) - var(--band-width) / 2);
+}
+
+.band img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100vh;
+  width: 100dvh;
+  height: var(--band-width);
+  transform: translate(-50%, -50%) rotate(-90deg);
+}
+
+/* Mirrored, so the pink side faces the middle */
+.band--left img {
+  transform: translate(-50%, -50%) rotate(-90deg) scaleY(-1);
+}
+
+/* ===== Table of projects ===== */
+.projects {
+  position: absolute;
+  top: var(--edge);
+  left: var(--edge);
+  font-size: var(--size-body);
+  line-height: var(--line-height-list);
+}
+
+/* Keeps the spaces before the title, like in Figma */
+.projects-title {
+  font-size: inherit;
   font-weight: 400;
-  font-size: var(--size-display);
-  line-height: normal;
-  color: var(--color-text);
-  text-align: center;
-  white-space: nowrap;
+  white-space: pre;
 }
 
-/* Narrow strip in the middle of the screen */
-.strip {
-  position: relative;
-  width: var(--strip-width);
-  background: var(--color-panel);
-  border: var(--border-width) solid var(--color-border);
+.project-list {
+  list-style: none;
+  margin-top: var(--line-height-list); /* one empty row under the title */
 }
 
-/* Vertical labels in the strip, read top to bottom.
-   Extra lines stack to the left. */
-.strip-label {
+.project-lines {
   position: absolute;
-  right: var(--label-right);
-  writing-mode: vertical-rl;
-  font-family: var(--font-label);
-  font-weight: 700;
-  font-size: var(--size-label);
+  top: calc(var(--lines-top) - var(--edge));
+  left: 0;
+  width: var(--lines-width);
+}
+
+/* ===== About text ===== */
+.bio {
+  position: absolute;
+  top: var(--bio-top);
+  left: var(--edge);
+  width: var(--bio-width);
+  font-size: var(--size-body);
   line-height: normal;
-  color: var(--color-muted);
+}
+
+/* ===== Vertical labels, read top to bottom ===== */
+.side-label {
+  position: absolute;
+  left: calc(50% - 9px);
+  writing-mode: vertical-rl;
+  font-size: var(--size-label);
+  font-weight: 500;
+  line-height: normal;
   white-space: nowrap;
 }
 
-.strip-label--name {
-  top: var(--name-top);
+.side-label--name {
+  top: var(--label-edge);
 }
 
-.strip-label--projects {
-  top: var(--projects-top);
-  color: var(--color-strong);
+.side-label--index {
+  bottom: var(--index-bottom);
 }
 
-.strip-label--info {
-  bottom: var(--info-bottom);
-}
-
-/* Lines end together at the bottom */
-.strip-label--links {
-  bottom: var(--links-bottom);
-  text-align: end;
+.side-label--contact {
+  bottom: var(--label-edge);
 }
