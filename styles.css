@@ -1,4 +1,4 @@
-/* ===== Design variables (from the Figma frame "Desktop - 35") ===== */
+/* ===== Design variables (from the Figma frames "Desktop - 35" and "Desktop - 33") ===== */
 :root {
   /* Colors */
   --color-page: #ffffff;      /* white background */
@@ -6,7 +6,7 @@
 
   /* Fonts */
   --font-main: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --size-body: 15.5px;        /* projects and about text */
+  --size-body: 15.5px;        /* projects, about text and captions */
   --size-label: 14px;         /* vertical labels */
   --line-height-list: 22px;   /* one row of the projects table */
 
@@ -20,6 +20,19 @@
   --lines-width: 670px;
   --band-width: 100px;
   --band-offset: 71px;        /* distance of each band's center from the screen center */
+
+  /* Index grid */
+  --index-top: 20px;
+  --index-left: calc(50% + 35px);
+  --thumb-width: 156px;
+  --thumb-height: 104px;
+  --thumb-tall: 235px;
+  --index-gap: 15px;          /* space between columns */
+  --index-row: 273px;         /* distance from one row of images to the next */
+
+  /* Index animation */
+  --index-time: 0.6s;
+  --index-rise: 20px;         /* how far the images move up while they appear */
 }
 
 /* ===== Base ===== */
@@ -35,7 +48,7 @@ body {
   font-family: var(--font-main);
 }
 
-/* ===== Layout: one screen, no scrolling ===== */
+/* ===== Layout: one screen. When the index is open, the page can scroll ===== */
 .page {
   position: relative;
   height: 100vh;
@@ -43,11 +56,18 @@ body {
   overflow: hidden;
 }
 
+.is-index-open .page {
+  height: auto;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow: visible;
+}
+
 /* ===== Pink bands ===== */
-/* Each band is a 100px wide column, full height.
+/* Each band is a 100px wide column that stays on screen while scrolling.
    The SVG is drawn lying down, so it is turned upright here. */
 .band {
-  position: absolute;
+  position: fixed;
   top: 0;
   width: var(--band-width);
   height: 100%;
@@ -119,10 +139,20 @@ body {
   position: absolute;
   left: calc(50% - 9px);
   writing-mode: vertical-rl;
+  font-family: var(--font-main);
   font-size: var(--size-label);
   font-weight: 500;
   line-height: normal;
+  color: var(--color-text);
   white-space: nowrap;
+}
+
+/* INDEX is a button: remove the browser's button look */
+button.side-label {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 
 .side-label--name {
@@ -135,4 +165,76 @@ body {
 
 .side-label--contact {
   bottom: var(--label-edge);
+}
+
+/* ===== Index grid ===== */
+.index-grid {
+  position: absolute;
+  top: var(--index-top);
+  left: var(--index-left);
+  display: grid;
+  grid-template-columns: repeat(4, var(--thumb-width));
+  grid-auto-rows: var(--index-row);
+  column-gap: var(--index-gap);
+
+  /* Closed: invisible and a little lower */
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(var(--index-rise));
+  transition:
+    opacity var(--index-time) ease,
+    transform var(--index-time) ease,
+    visibility 0s linear var(--index-time); /* hide only after fading out */
+}
+
+/* Open: fades in and moves up into place */
+.is-index-open .index-grid {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  transition:
+    opacity var(--index-time) ease,
+    transform var(--index-time) ease,
+    visibility 0s;
+}
+
+.index-item img {
+  display: block;
+  width: var(--thumb-width);
+  height: var(--thumb-height);
+  object-fit: cover;
+}
+
+.index-item--tall img {
+  height: var(--thumb-tall);
+}
+
+.index-item figcaption {
+  font-size: var(--size-body);
+  line-height: var(--line-height-list);
+}
+
+/* Frame that shows only the middle of a slightly bigger image */
+.index-crop {
+  position: relative;
+  width: var(--thumb-width);
+  height: var(--thumb-tall);
+  overflow: hidden;
+}
+
+.index-crop img {
+  position: absolute;
+  top: -5.38%;
+  left: -4.39%;
+  width: 108.73%;
+  height: 108.7%;
+  max-width: none;
+}
+
+/* People who turn off animations in their system settings see no motion */
+@media (prefers-reduced-motion: reduce) {
+  .index-grid,
+  .is-index-open .index-grid {
+    transition: none;
+  }
 }

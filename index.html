@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Shay Tchwella — Portfolio</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
 </head>
 <body>
   <main class="page">
@@ -42,9 +43,84 @@
     <!-- Vertical labels in the middle column -->
     <nav class="side-nav">
       <p class="side-label side-label--name">SHAY TCHWELLA</p>
-      <p class="side-label side-label--index">INDEX</p>
+      <button class="side-label side-label--index" type="button" aria-expanded="false" aria-controls="index-grid">INDEX</button>
       <p class="side-label side-label--contact">CONTACT</p>
     </nav>
+
+    <!-- Index: grid of images, opens when INDEX is clicked -->
+    <section class="index-grid" id="index-grid" aria-label="Index">
+      <figure class="index-item">
+        <img src="images/index-1-01.png" alt="">
+        <figcaption>[ 1.01 ]</figcaption>
+      </figure>
+      <figure class="index-item">
+        <img src="images/index-1-02.png" alt="">
+        <figcaption>[ 1.02 ]</figcaption>
+      </figure>
+      <figure class="index-item">
+        <img src="images/index-1-03.png" alt="">
+        <figcaption>[ 1.03 ]</figcaption>
+      </figure>
+      <figure class="index-item">
+        <img src="images/index-1-04.png" alt="">
+        <figcaption>[ 1.04 ]</figcaption>
+      </figure>
+
+      <figure class="index-item">
+        <img src="images/index-1-05.png" alt="">
+        <figcaption>[ 1.05 ]</figcaption>
+      </figure>
+      <figure class="index-item">
+        <img src="images/index-1-06.png" alt="">
+        <figcaption>[ 1.06 ]</figcaption>
+      </figure>
+      <figure class="index-item index-item--tall">
+        <!-- This image is zoomed in a little, like in Figma -->
+        <div class="index-crop">
+          <img src="images/index-1-07.png" alt="">
+        </div>
+        <figcaption>[ 1.07 ]</figcaption>
+      </figure>
+      <figure class="index-item">
+        <img src="images/index-1-08.png" alt="">
+        <figcaption>[ 1.08 ]</figcaption>
+      </figure>
+
+      <figure class="index-item">
+        <img src="images/index-1-09.png" alt="">
+        <figcaption>[ 1.09 ]</figcaption>
+      </figure>
+      <figure class="index-item">
+        <img src="images/index-1-10.png" alt="">
+        <figcaption>[ 1.10 ]</figcaption>
+      </figure>
+      <figure class="index-item">
+        <img src="images/index-1-11.png" alt="">
+        <figcaption>[ 1.11 ]</figcaption>
+      </figure>
+      <figure class="index-item">
+        <img src="images/index-1-12.png" alt="">
+        <figcaption>[ 1.12 ]</figcaption>
+      </figure>
+
+      <figure class="index-item">
+        <img src="images/index-1-13.png" alt="">
+        <figcaption>[ 1.13 ]</figcaption>
+      </figure>
+      <figure class="index-item index-item--tall">
+        <img src="images/index-1-14.png" alt="">
+        <figcaption>[ 1.14 ]</figcaption>
+      </figure>
+      <figure class="index-item">
+        <img src="images/index-1-15.png" alt="">
+        <figcaption>[ 1.15 ]</figcaption>
+      </figure>
+      <figure class="index-item">
+        <!-- Placeholder: same image as 1.15 until the real one is ready -->
+        <img src="images/index-1-15.png" alt="">
+        <figcaption>[ 1.16 ]</figcaption>
+      </figure>
+    </section>
   </main>
 </body>
 </html>
