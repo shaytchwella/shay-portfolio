@@ -651,6 +651,9 @@ body {
     --m-content-top: 12px;      /* from the spine to the first number below it */
     --m-grid-gap: 11px;         /* index: space between two images side by side */
     --m-row-gap: 7px;           /* space under each image, before the next number */
+    --m-fold-time: 420ms;       /* rows and descriptions open and close like a window blind */
+    --m-text-fade: 260ms;       /* ...while their text fades a little faster */
+    --m-clear-zone: 26px;       /* right above the spine no text is ever seen (one row) */
     --spine-y: calc(50vh - var(--m-spine-height) / 2); /* top of the spine, starts in the middle */
     --spine-y: calc(50dvh - var(--m-spine-height) / 2);
     transition: --spine-y var(--index-time) ease;
@@ -663,15 +666,18 @@ body {
 
   /* Top part: from the screen top to the spine.
      Its text fades out into the pink band above the spine, so while the spine is pushed up
-     the description disappears little by little. The title and the open project's row
-     (the first 2 rows) never fade: the fade gets shorter as the spine comes close to them */
+     the description disappears little by little, and right above the spine (--m-clear-zone)
+     nothing shows at all. The title and the open project's row (the first 2 rows) never fade:
+     the fade gets shorter as the spine comes close to them */
   .pane--left {
-    --fade: clamp(0px, calc(var(--spine-y) - var(--edge) - 2 * var(--line-height-table)), var(--band-width));
+    --keep: calc(var(--edge) + 2 * var(--line-height-table)); /* bottom of the open project's row */
+    --fade-start: max(var(--keep), calc(100% - var(--band-width)));
+    --fade-end: max(calc(var(--keep) + 1px), calc(100% - var(--m-clear-zone)));
     width: 100%;
     height: var(--spine-y);
     padding-bottom: var(--band-width); /* lets the last lines scroll up out of the fade */
-    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade)), transparent);
-    mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade)), transparent);
+    -webkit-mask-image: linear-gradient(to bottom, #000 var(--fade-start), transparent var(--fade-end));
+    mask-image: linear-gradient(to bottom, #000 var(--fade-start), transparent var(--fade-end));
   }
 
   /* Bottom part: from the spine to the screen bottom */
@@ -761,12 +767,42 @@ body {
   }
 
   /* ----- Table of projects ----- */
+  /* The title row and its line stay at the top of the top part. The projects scroll under
+     them and disappear when they reach the line */
   .projects {
-    position: relative;
-    top: auto;
-    left: auto;
-    margin: var(--edge) var(--m-edge) 0;
+    display: contents; /* lets the title stay put for the whole top part, contact details too */
     font-size: var(--m-size);
+  }
+
+  .projects-head {
+    position: sticky;
+    z-index: 1;
+    top: 0;
+    padding: var(--edge) var(--m-edge) 0;
+    font-size: var(--m-size);
+    line-height: var(--line-height-table);
+    background: var(--color-page);
+  }
+
+  /* The line under the title (on bigger screens it is the top line of the list) */
+  .project-list::before {
+    display: none;
+  }
+
+  .projects-head::after {
+    content: "";
+    position: absolute;
+    left: var(--m-edge);
+    right: var(--m-edge);
+    bottom: 0;
+    height: var(--line-width);
+    background: var(--color-line);
+  }
+
+  .project-list {
+    margin: 0 var(--m-edge);
+    font-size: var(--m-size);
+    line-height: var(--line-height-table);
   }
 
   .project-list::before,
@@ -782,8 +818,8 @@ body {
   .projects-toggle {
     display: block;
     position: absolute;
-    top: 0;
-    right: 0;
+    top: var(--edge);
+    right: var(--m-edge);
     height: var(--line-height-table);
     font: inherit;
     color: inherit;
@@ -816,12 +852,18 @@ body {
     height: var(--line-height-table);
     transition:
       color 0.15s linear,
-      height var(--index-time) ease;
+      height var(--m-fold-time) ease,
+      opacity var(--m-text-fade) ease;
   }
 
   .project-list:has(.is-open) .project:not(.is-open),
   .is-collapsed .project:not(.is-open) {
     pointer-events: none;
+  }
+
+  .project-list:has(.is-open) .project:not(.is-open) .project-name,
+  .is-collapsed .project:not(.is-open) .project-name {
+    opacity: 0;
   }
 
   .project-list:has(.is-open) .project:not(.is-open) .project-name,
@@ -849,9 +891,24 @@ body {
     opacity: 1;
   }
 
-  /* Description: an empty line before and after it */
+  /* Description: an empty line before and after it.
+     It opens and closes like a window blind, its text fading a little faster */
   .project-details {
     line-height: normal;
+    transition: grid-template-rows var(--m-fold-time) ease;
+  }
+
+  .project-details-inner {
+    opacity: 0;
+    transition: opacity var(--m-text-fade) ease;
+  }
+
+  .project.is-open .project-details-inner {
+    opacity: 1;
+  }
+
+  .is-collapsed .project.is-open .project-details-inner {
+    opacity: 0;
   }
 
   .project-details p {
@@ -903,10 +960,15 @@ body {
     gap: 0;
   }
 
+  /* Numbers above the images: the same size as the numbers in the table */
+  .index-item figcaption {
+    font-size: var(--m-size);
+  }
+
   .case-number {
     display: block;
     height: var(--caption-height);
-    font-size: var(--size-body);
+    font-size: var(--m-size);
     line-height: var(--line-height-text);
   }
 

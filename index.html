@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Shay Tchwella — Portfolio</title>
-  <link rel="stylesheet" href="styles.css?v=mobile11">
-  <script src="script.js?v=mobile11" defer></script>
+  <link rel="stylesheet" href="styles.css?v=mobile12">
+  <script src="script.js?v=mobile12" defer></script>
 </head>
 <body>
   <main class="page">
@@ -22,11 +22,14 @@
 
       <!-- Table of projects (top left). A red line sits under every project but the last -->
       <section class="projects">
-        <h1 class="projects-title">Table of Projects</h1>
-        <!-- Phone only: ✕ shows only the images, + brings the text back (+ also when nothing is open) -->
-        <button class="projects-toggle" type="button" aria-label="Show only the images">
-          <span class="toggle-cross" aria-hidden="true">✕</span>
-        </button>
+        <!-- On a phone the title and the line under it stay at the top while the text scrolls -->
+        <div class="projects-head">
+          <h1 class="projects-title">Table of Projects</h1>
+          <!-- Phone only: ✕ shows only the images, + brings the text back (+ also when nothing is open) -->
+          <button class="projects-toggle" type="button" aria-label="Show only the images">
+            <span class="toggle-cross" aria-hidden="true">✕</span>
+          </button>
+        </div>
         <ol class="project-list">
           <li class="project">
             <button class="project-name project-toggle" type="button" aria-expanded="false" aria-controls="case-bezalel"><span class="project-number">1</span>Bezalel Graduation Exhibition</button>
