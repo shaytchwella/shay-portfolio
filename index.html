@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Shay Tchwella — Portfolio</title>
-  <link rel="stylesheet" href="styles.css">
-  <script src="script.js" defer></script>
+  <link rel="stylesheet" href="styles.css?v=mobile9">
+  <script src="script.js?v=mobile9" defer></script>
 </head>
 <body>
   <main class="page">
@@ -17,110 +17,340 @@
       <img src="images/band-right.svg" alt="">
     </div>
 
-    <!-- Table of projects (top left) -->
-    <section class="projects">
-      <h1 class="projects-title">       Table of Projects</h1>
-      <ol class="project-list">
-        <li>[ 1 ] Bezalel Graduation Exhibition</li>
-        <li>[ 2 ] Brutality, Revival and Her Name Is Miar</li>
-        <li>[ 3 ] Jericho First</li>
-        <li>[ 4 ] SUM Chocolad</li>
-        <li>[ 5 ] Barricades</li>
-        <li>[ 6 ] A butcher and his two sisters</li>
-        <li>[ 7 ] Gerbille seeks socks</li>
-        <li>[ 8 ] Sarah Shara</li>
-      </ol>
-      <!-- Red lines between the projects -->
-      <img class="project-lines" src="images/project-lines.svg" alt="">
-    </section>
+    <!-- Left half: scrolls on its own, only when its content is taller than the screen -->
+    <div class="pane pane--left">
 
-    <!-- About text (bottom left) -->
-    <p class="bio">
-      Jerusalem based visual communicator. I aim<br>
-      to design through exploration, experimentation and curiosity. Drawn to print, typography and color. I’m interested in how content takes shape and meaning through visual decisions.
-    </p>
+      <!-- Table of projects (top left). A red line sits under every project but the last -->
+      <section class="projects">
+        <h1 class="projects-title">Table of Projects</h1>
+        <!-- Phone only: — when nothing is open, ✕ shows only the images, + brings the text back -->
+        <button class="projects-toggle" type="button" aria-label="Show only the images">
+          <span class="toggle-dash" aria-hidden="true">—</span>
+          <span class="toggle-cross" aria-hidden="true">✕</span>
+        </button>
+        <ol class="project-list">
+          <li class="project">
+            <button class="project-name project-toggle" type="button" aria-expanded="false" aria-controls="case-bezalel"><span class="project-number">1</span>Bezalel Graduation Exhibition</button>
+            <span class="project-year">2026</span> <!-- phone only, while the project is open -->
+            <!-- Opens when the name is clicked and pushes the next projects down -->
+            <div class="project-details">
+              <div class="project-details-inner">
+                <p>As part of the branding team for Bezalel’s 2026 Graduation Exhibition, <em>Boom Bogrim</em>, I collaborated with designers and curators to develop a bold, expressive visual identity. The concept explored a sense of rupture and transformation through explosive variable typography that extended across walls, printed materials, and digital screens. At the heart of the exhibition, a large-scale AI-generated film brought the graduates’ works into motion, capturing the quiet, poetic aftermath of an explosion.</p>
+              </div>
+            </div>
+          </li>
+          <li class="project">
+            <span class="project-name"><span class="project-number">2</span>Brutality, Revival and Her Name Is Miar</span>
+          </li>
+          <li class="project">
+            <button class="project-name project-toggle" type="button" aria-expanded="false" aria-controls="case-jericho"><span class="project-number">3</span>Jericho First</button>
+            <!-- Opens when the name is clicked and pushes the next projects down -->
+            <div class="project-details">
+              <div class="project-details-inner">
+                <p>Editorial Design of an educational booklet based on Wikipedia's “Jericho“ entry and a complementary website for a fictional conference addressing the topic of Jericho. The project features photography from the Israeli International Library. The booklet seeks to bring a new reading of the curse of Jericho from biblical times to our own days.</p>
+                <p>
+                  Created as part of Graphic Design-Typography 03 course,<br>
+                  Instructed by Idan Vaaknin, 2nd year.<br>
+                  Print - 25X18CM<br>
+                  Poster - 1000X700CM<br>
+                  Website
+                </p>
+              </div>
+            </div>
+          </li>
+          <li class="project">
+            <button class="project-name project-toggle" type="button" aria-expanded="false" aria-controls="case-sum"><span class="project-number">4</span>SUM Chocolad</button>
+            <!-- Opens when the name is clicked and pushes the next projects down -->
+            <div class="project-details">
+              <div class="project-details-inner">
+                <p>Brand and packaging design identity for medicinal mushrooms. Offering a new look and way to consume. The mushrooms are offered as a daily cocholate treat while benefiting the plant's propoperties. The project encompassed packaging design, social media content creation, and branding identity.</p>
+                <!-- <bdi> keeps the Hebrew word in its own direction inside the English sentence -->
+                <p>The logo spells in hebrew '<bdi lang="he">סַם</bdi>', sum which means drug. The circle stands for the pill, virtues of the mushrooms. Along with the square, choclate cube, featuring a new way to take the drug.</p>
+                <p>
+                  Created as part of Introduction to Branding course,<br>
+                  instructed by Rotem Bixenshpaner, 2nd year.
+                </p>
+              </div>
+            </div>
+          </li>
+          <li class="project">
+            <span class="project-name"><span class="project-number">5</span>Barricades</span>
+          </li>
+          <li class="project">
+            <span class="project-name"><span class="project-number">6</span>A butcher and his two sisters</span>
+          </li>
+          <li class="project">
+            <span class="project-name"><span class="project-number">7</span>Gerbille seeks socks</span>
+          </li>
+          <li class="project">
+            <span class="project-name"><span class="project-number">8</span>Sarah Shara</span>
+          </li>
+        </ol>
+      </section>
+
+      <!-- Bottom left: about text and contact details. Both open and close with CONTACT -->
+      <div class="about" id="contact">
+        <p class="bio">
+          Jerusalem based visual communicator. I aim<br>
+          to design through exploration, experimentation and curiosity. Drawn to print, typography and color. I’m interested in how content takes shape and meaning through visual decisions.
+        </p>
+
+        <address class="contact">
+          <a href="mailto:shay.tchwella@gmail.com">shay.tchwella@gmail.com</a><br>
+          <a href="https://www.instagram.com/shay_tchwella/" target="_blank" rel="noopener">@shay_tchwella</a><br>
+          <a href="tel:+972549809026">+972 54 980 9026</a>
+        </address>
+      </div>
+
+    </div>
+
+    <!-- The spine: the white middle column. Drag it left or right -->
+    <div class="spine" aria-hidden="true"></div>
 
     <!-- Vertical labels in the middle column -->
     <nav class="side-nav">
-      <p class="side-label side-label--name">SHAY TCHWELLA</p>
+      <button class="side-label side-label--name" type="button">SHAY TCHWELLA</button>
       <button class="side-label side-label--index" type="button" aria-expanded="false" aria-controls="index-grid">INDEX</button>
-      <p class="side-label side-label--contact">CONTACT</p>
+      <button class="side-label side-label--contact" type="button" aria-expanded="false" aria-controls="contact">CONTACT</button>
     </nav>
 
-    <!-- Index: grid of images, opens when INDEX is clicked -->
-    <section class="index-grid" id="index-grid" aria-label="Index">
-      <figure class="index-item">
-        <img src="images/index-1-01.png" alt="">
-        <figcaption>[ 1.01 ]</figcaption>
-      </figure>
-      <figure class="index-item">
-        <img src="images/index-1-02.png" alt="">
-        <figcaption>[ 1.02 ]</figcaption>
-      </figure>
-      <figure class="index-item">
-        <img src="images/index-1-03.png" alt="">
-        <figcaption>[ 1.03 ]</figcaption>
-      </figure>
-      <figure class="index-item">
-        <img src="images/index-1-04.png" alt="">
-        <figcaption>[ 1.04 ]</figcaption>
-      </figure>
+    <!-- Right half: scrolls on its own, only when its content is taller than the screen -->
+    <div class="pane pane--right">
 
-      <figure class="index-item">
-        <img src="images/index-1-05.png" alt="">
-        <figcaption>[ 1.05 ]</figcaption>
-      </figure>
-      <figure class="index-item">
-        <img src="images/index-1-06.png" alt="">
-        <figcaption>[ 1.06 ]</figcaption>
-      </figure>
-      <figure class="index-item index-item--tall">
-        <!-- This image is zoomed in a little, like in Figma -->
-        <div class="index-crop">
-          <img src="images/index-1-07.png" alt="">
+      <!-- Index: grid of images, opens when INDEX is clicked -->
+      <section class="index-grid" id="index-grid" aria-label="Index">
+        <!-- 1: Bezalel Graduation Exhibition -->
+        <figure class="index-item">
+          <figcaption>1.01</figcaption>
+          <img src="images/index-1-01.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>1.02</figcaption>
+          <img src="images/index-1-02.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>1.03</figcaption>
+          <img src="images/index-1-03.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>1.04</figcaption>
+          <img src="images/index-1-04.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>1.05</figcaption>
+          <img src="images/index-1-05.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>1.06</figcaption>
+          <img src="images/index-1-06.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>1.07</figcaption>
+          <img src="images/index-1-07.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>1.08</figcaption>
+          <img src="images/index-1-08.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>1.09</figcaption>
+          <img src="images/index-1-09.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>1.10</figcaption>
+          <img src="images/index-1-10.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>1.11</figcaption>
+          <img src="images/index-1-11.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>1.12</figcaption>
+          <img src="images/index-1-12.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>1.13</figcaption>
+          <img src="images/index-1-13.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>1.14</figcaption>
+          <img src="images/index-1-14.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>1.15</figcaption>
+          <img src="images/index-1-15.jpg" alt="">
+        </figure>
+        <!-- 3: Jericho First (3.01 is the cover of the booklet video) -->
+        <figure class="index-item">
+          <figcaption>3.01</figcaption>
+          <img src="images/index-3-01.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>3.02</figcaption>
+          <img src="images/index-3-02.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>3.03</figcaption>
+          <img src="images/index-3-03.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>3.04</figcaption>
+          <img src="images/index-3-04.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>3.05</figcaption>
+          <img src="images/index-3-05.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>3.06</figcaption>
+          <img src="images/index-3-06.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>3.07</figcaption>
+          <img src="images/index-3-07.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>3.08</figcaption>
+          <img src="images/index-3-08.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>3.09</figcaption>
+          <img src="images/index-3-09.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>3.10</figcaption>
+          <img src="images/index-3-10.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>3.11</figcaption>
+          <img src="images/index-3-11.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>3.12</figcaption>
+          <img src="images/index-3-12.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>3.13</figcaption>
+          <img src="images/index-3-13.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>3.14</figcaption>
+          <img src="images/index-3-14.jpg" alt="">
+        </figure>
+        <!-- 4: SUM Chocolad -->
+        <figure class="index-item">
+          <figcaption>4.01</figcaption>
+          <img src="images/index-4-01.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>4.02</figcaption>
+          <img src="images/index-4-02.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>4.03</figcaption>
+          <img src="images/index-4-03.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>4.04</figcaption>
+          <img src="images/index-4-04.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>4.05</figcaption>
+          <img src="images/index-4-05.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>4.06</figcaption>
+          <img src="images/index-4-06.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>4.07</figcaption>
+          <img src="images/index-4-07.jpg" alt="">
+        </figure>
+      </section>
+
+      <!-- Case study: Bezalel Graduation Exhibition. Opens after its text in the table -->
+      <section class="case" id="case-bezalel" aria-label="Bezalel Graduation Exhibition">
+        <img class="case-image" src="images/bezalel-01.jpg" alt="">
+        <img class="case-image" src="images/bezalel-02.jpg" alt="">
+        <img class="case-image" src="images/bezalel-03.jpg" alt="">
+        <img class="case-image" src="images/bezalel-04.jpg" alt="">
+        <img class="case-image" src="images/bezalel-05.jpg" alt="">
+        <img class="case-image" src="images/bezalel-06.jpg" alt="">
+        <img class="case-image case-image--portrait" src="images/bezalel-07.jpg" alt="">
+        <img class="case-image" src="images/bezalel-08.jpg" alt="">
+        <img class="case-image" src="images/bezalel-09.jpg" alt="">
+        <img class="case-image" src="images/bezalel-10.jpg" alt="">
+        <img class="case-image" src="images/bezalel-11.jpg" alt="">
+        <img class="case-image" src="images/bezalel-12.jpg" alt="">
+        <img class="case-image" src="images/bezalel-13.jpg" alt="">
+        <img class="case-image case-image--portrait" src="images/bezalel-14.jpg" alt="">
+        <img class="case-image" src="images/bezalel-15.jpg" alt="">
+      </section>
+
+      <!-- Case study: SUM Chocolad. Opens after its text in the table -->
+      <section class="case" id="case-sum" aria-label="SUM Chocolad">
+        <img class="case-image" src="images/sum-01.jpg" alt="">
+        <img class="case-image" src="images/sum-02.jpg" alt="">
+        <img class="case-image" src="images/sum-03.jpg" alt="">
+        <img class="case-image" src="images/sum-04.jpg" alt="">
+        <img class="case-image" src="images/sum-05.jpg" alt="">
+        <!-- Leaflet -->
+        <img class="case-image" src="images/sum-leaflet.jpg" alt="">
+        <!-- Poster -->
+        <img class="case-image case-image--portrait" src="images/sum-poster.jpg" alt="">
+      </section>
+
+      <!-- Case study: Jericho First. Opens after its text in the table -->
+      <section class="case" id="case-jericho" aria-label="Jericho First">
+        <!-- Booklet video: plays all the time, on repeat, without sound -->
+        <video class="case-video" src="images/jericho-booklet-video.mp4" autoplay muted loop playsinline></video>
+
+        <!-- Booklet photos. Each one is turned on its side and zoomed in a little, like in Figma.
+             The numbers set the zoom and position of each photo inside its frame. -->
+        <div class="case-photo">
+          <div class="case-photo-frame">
+            <img src="images/jericho-booklet-041.jpg" alt="" style="--crop-w: 110%; --crop-h: 109.89%; --crop-x: -6.37%; --crop-y: -0.04%;">
+          </div>
         </div>
-        <figcaption>[ 1.07 ]</figcaption>
-      </figure>
-      <figure class="index-item">
-        <img src="images/index-1-08.png" alt="">
-        <figcaption>[ 1.08 ]</figcaption>
-      </figure>
+        <div class="case-photo">
+          <div class="case-photo-frame">
+            <img src="images/jericho-booklet-044.jpg" alt="" style="--crop-w: 111%; --crop-h: 110.89%; --crop-x: -7.63%; --crop-y: -0.08%;">
+          </div>
+        </div>
+        <div class="case-photo">
+          <div class="case-photo-frame">
+            <img src="images/jericho-booklet-046.jpg" alt="" style="--crop-w: 110.88%; --crop-h: 111%; --crop-x: -4.13%; --crop-y: -0.36%;">
+          </div>
+        </div>
+        <div class="case-photo">
+          <div class="case-photo-frame">
+            <img src="images/jericho-booklet-047.jpg" alt="" style="--crop-w: 108.88%; --crop-h: 109%; --crop-x: -4.44%; --crop-y: 0.13%;">
+          </div>
+        </div>
+        <div class="case-photo case-photo--tall">
+          <div class="case-photo-frame">
+            <img src="images/jericho-booklet-048.jpg" alt="" style="--crop-w: 106.87%; --crop-h: 109.9%; --crop-x: -5.03%; --crop-y: 0%;">
+          </div>
+        </div>
+        <div class="case-photo">
+          <div class="case-photo-frame">
+            <img src="images/jericho-booklet-051.jpg" alt="" style="--crop-w: 110%; --crop-h: 109.89%; --crop-x: -5.84%; --crop-y: 0.02%;">
+          </div>
+        </div>
 
-      <figure class="index-item">
-        <img src="images/index-1-09.png" alt="">
-        <figcaption>[ 1.09 ]</figcaption>
-      </figure>
-      <figure class="index-item">
-        <img src="images/index-1-10.png" alt="">
-        <figcaption>[ 1.10 ]</figcaption>
-      </figure>
-      <figure class="index-item">
-        <img src="images/index-1-11.png" alt="">
-        <figcaption>[ 1.11 ]</figcaption>
-      </figure>
-      <figure class="index-item">
-        <img src="images/index-1-12.png" alt="">
-        <figcaption>[ 1.12 ]</figcaption>
-      </figure>
+        <!-- Poster -->
+        <img class="case-poster" src="images/jericho-poster.jpg" alt="">
 
-      <figure class="index-item">
-        <img src="images/index-1-13.png" alt="">
-        <figcaption>[ 1.13 ]</figcaption>
-      </figure>
-      <figure class="index-item index-item--tall">
-        <img src="images/index-1-14.png" alt="">
-        <figcaption>[ 1.14 ]</figcaption>
-      </figure>
-      <figure class="index-item">
-        <img src="images/index-1-15.png" alt="">
-        <figcaption>[ 1.15 ]</figcaption>
-      </figure>
-      <figure class="index-item">
-        <!-- Placeholder: same image as 1.15 until the real one is ready -->
-        <img src="images/index-1-15.png" alt="">
-        <figcaption>[ 1.16 ]</figcaption>
-      </figure>
-    </section>
+        <!-- Website screenshots. --box is each frame's width / height in Figma -->
+        <img class="case-screen" src="images/jericho-website-1.jpg" alt="" style="--box: 669 / 423;">
+        <img class="case-screen" src="images/jericho-website-2.jpg" alt="" style="--box: 669 / 428;">
+        <img class="case-screen" src="images/jericho-website-3.jpg" alt="" style="--box: 669 / 427;">
+        <img class="case-screen" src="images/jericho-website-4.jpg" alt="" style="--box: 669 / 433;">
+        <img class="case-screen" src="images/jericho-website-5.jpg" alt="" style="--box: 669 / 433;">
+        <img class="case-screen" src="images/jericho-website-6.jpg" alt="" style="--box: 669 / 432;">
+      </section>
+
+    </div>
   </main>
 </body>
 </html>

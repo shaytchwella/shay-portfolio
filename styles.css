@@ -1,34 +1,64 @@
-/* ===== Design variables (from the Figma frames "Desktop - 35" and "Desktop - 33") ===== */
+/* ===== Design variables (from the Figma frames "Desktop - 33" to "Desktop - 38") ===== */
 :root {
   /* Colors */
   --color-page: #ffffff;      /* white background */
   --color-text: #000000;      /* all text */
+  --color-accent: #ff1f21;    /* red: hovered and open projects, wavy lines, label underlines */
+  --color-line: #ff1f21;      /* the straight lines of the projects table (same red as --color-accent) */
 
   /* Fonts */
   --font-main: "Helvetica Neue", Helvetica, Arial, sans-serif;
   --size-body: 15.5px;        /* projects, about text and captions */
   --size-label: 14px;         /* vertical labels */
-  --line-height-list: 22px;   /* one row of the projects table */
+  --line-height-table: 26px;  /* one row of the projects table: roomy, easy to point at and click */
+  --number-column: 34.5px;    /* projects table: the numbers sit in this column, the names start after it
+                                 (in Figma: the width of 8 spaces) */
+  --line-height-text: 22px;   /* reading text: a project's description, and the index numbers */
+  --line-height-about: 18px;  /* description paragraph and contact details */
+
+  /* The spine (white middle column). script.js changes --spine-x while dragging */
+  --spine-x: calc(50vw - var(--spine-width) / 2); /* left edge of the spine, starts in the middle */
+  --spine-width: 40px;
+  --label-inset: 11px;        /* labels' distance from the spine's left edge */
 
   /* Spacing and sizes */
   --edge: 15px;               /* distance of the left content from the screen edge */
-  --label-edge: 20px;         /* distance of the top and bottom labels from the screen edge */
-  --index-bottom: 126px;      /* "INDEX", distance from the bottom */
-  --bio-top: calc(100% - 175px); /* about text starts 175px above the bottom */
+  --label-edge: 20px;         /* top and bottom margin: nothing goes closer to the screen edge.
+                                 The bottom margin is where the word CONTACT ends */
+  --about-lines: 9;           /* description (5 lines) + empty line + contact details (3 lines) */
+  --index-from-bottom: calc(var(--label-edge) + var(--about-lines) * var(--line-height-about));
+                              /* top of the word INDEX above the screen bottom: in line with the
+                                 top of the description when the contact details are under it */
   --bio-width: 328px;
-  --lines-top: 82.2px;        /* first red line, under project 1 */
-  --lines-width: 670px;
+  --contact-width: 327px;
+  --line-width: 0.8px;        /* thickness of the red lines in the table */
+  --line-offset: 1.2px;       /* side labels: the red underline sits a little away from the word */
+  --table-line-offset: -0.8px; /* projects table: each red line sits right on the bottom edge of its row */
+  --wave-length: 14px;        /* hovered project or label: one wave of its wavy line */
+  --wave-height: 2px;         /* hovered project or label: height of the waves, top to bottom (gentle) */
+  --wave-stroke: 1.1px;       /* thickness of the wavy line: a curve looks thinner, so it is a bit
+                                 thicker than --line-width to look the same as the straight lines */
+  --wave-time: 0.6s;          /* hover: how long the line takes to curl, from one end to the other */
+  --wave-back-time: 0.4s;     /* mouse leaves: how long the wave takes to stretch back */
+  --wave-box: 8px;            /* room for the wavy line drawing */
+  --details-max-width: 599px; /* widest project text, with the spine in the middle */
   --band-width: 100px;
-  --band-offset: 71px;        /* distance of each band's center from the screen center */
 
-  /* Index grid */
+  /* Index grid and case study (right half) */
   --index-top: 20px;
-  --index-left: calc(50% + 35px);
-  --thumb-width: 156px;
-  --thumb-height: 104px;
-  --thumb-tall: 235px;
-  --index-gap: 15px;          /* space between columns */
-  --index-row: 273px;         /* distance from one row of images to the next */
+  --index-gap: 15px;          /* space between columns, and between the spine and the images */
+  --index-right: 16px;        /* space between the images and the right edge of the screen */
+  --grid-top: 14px;           /* index: top of the first row of numbers ("Desktop - 40") */
+  --grid-side: 16px;          /* index: space from the spine and from the right edge of the screen */
+  --grid-gap: 12px;           /* index: space between two images side by side */
+  --caption-height: 23px;     /* index: number above each image, the image starts right after it */
+  --index-cell-ratio: 124 / 230; /* column width / distance from one row to the next */
+  --case-gap: 15px;           /* space between case study images */
+
+  /* Cursors from Figma. The two numbers are the cursor's point: the middle of each shape */
+  --cursor-left: url("images/cursor-circle.svg") 10 10, auto;   /* left half */
+  --cursor-spine: url("images/cursor-arrows.svg") 12 12, col-resize; /* the spine */
+  --cursor-right: url("images/cursor-square.svg") 9 9, auto;    /* right half (images) */
 
   /* Index animation */
   --index-time: 0.6s;
@@ -48,7 +78,32 @@ body {
   font-family: var(--font-main);
 }
 
-/* ===== Layout: one screen. When the index is open, the page can scroll ===== */
+/* No text selection while the spine is dragged */
+.is-dragging {
+  user-select: none;
+}
+
+/* ===== Cursors: a different one on each part of the screen ===== */
+/* "*" means: also on everything inside, like links, buttons and images */
+.pane--left,
+.pane--left * {
+  cursor: var(--cursor-left);
+}
+
+.pane--right,
+.pane--right * {
+  cursor: var(--cursor-right);
+}
+
+/* The spine and its labels. Also anywhere while the spine is being dragged */
+.spine,
+.side-label,
+.is-dragging,
+.is-dragging * {
+  cursor: var(--cursor-spine);
+}
+
+/* ===== Layout: one screen. The page itself never scrolls ===== */
 .page {
   position: relative;
   height: 100vh;
@@ -56,14 +111,47 @@ body {
   overflow: hidden;
 }
 
-.is-index-open .page {
-  height: auto;
-  min-height: 100vh;
-  min-height: 100dvh;
-  overflow: visible;
+/* Each half of the screen scrolls on its own.
+   "auto" means: a scrollbar only when there is more content below */
+.pane {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none; /* no visible scrollbar, so the content never shifts */
 }
 
-/* ===== Pink bands ===== */
+.pane::-webkit-scrollbar {
+  display: none; /* same, for Safari */
+}
+
+/* Left half: from the screen edge to the spine */
+.pane--left {
+  left: 0;
+  width: var(--spine-x);
+  container: left-half / inline-size; /* lets the contact details check how wide this half is */
+}
+
+/* Right half: from the spine to the screen edge */
+.pane--right {
+  left: calc(var(--spine-x) + var(--spine-width));
+  right: 0;
+  container: right-half / inline-size; /* lets the index grid check how wide this half is */
+}
+
+/* ===== The spine: grab area for dragging ===== */
+.spine {
+  position: fixed;
+  top: 0;
+  left: var(--spine-x);
+  width: var(--spine-width);
+  height: 100%;
+  touch-action: none; /* lets a finger drag it on touch screens */
+  user-select: none;  /* never highlighted when clicked or dragged */
+}
+
+/* ===== Pink bands on both sides of the spine ===== */
 /* Each band is a 100px wide column that stays on screen while scrolling.
    The SVG is drawn lying down, so it is turned upright here. */
 .band {
@@ -74,11 +162,11 @@ body {
 }
 
 .band--left {
-  left: calc(50% - var(--band-offset) - var(--band-width) / 2);
+  left: calc(var(--spine-x) - var(--band-width));
 }
 
 .band--right {
-  left: calc(50% + var(--band-offset) - var(--band-width) / 2);
+  left: calc(var(--spine-x) + var(--spine-width));
 }
 
 .band img {
@@ -91,7 +179,7 @@ body {
   transform: translate(-50%, -50%) rotate(-90deg);
 }
 
-/* Mirrored, so the pink side faces the middle */
+/* Mirrored, so the pink side faces the spine */
 .band--left img {
   transform: translate(-50%, -50%) rotate(-90deg) scaleY(-1);
 }
@@ -102,42 +190,191 @@ body {
   top: var(--edge);
   left: var(--edge);
   font-size: var(--size-body);
-  line-height: var(--line-height-list);
+  line-height: var(--line-height-table);
 }
 
-/* Keeps the spaces before the title, like in Figma */
+/* The title starts where the project names start */
 .projects-title {
+  padding-left: var(--number-column);
   font-size: inherit;
   font-weight: 400;
-  white-space: pre;
 }
 
 .project-list {
+  position: relative;
   list-style: none;
-  margin-top: var(--line-height-list); /* one empty row under the title */
 }
 
-.project-lines {
+.project {
+  position: relative;
+}
+
+/* Red lines of the table: one above the first project, and one under every project.
+   They reach until just before the spine */
+.project-list::before,
+.project::after {
+  content: "";
   position: absolute;
-  top: calc(var(--lines-top) - var(--edge));
+  top: var(--table-line-offset);
   left: 0;
-  width: var(--lines-width);
+  width: calc(var(--spine-x) - 2 * var(--edge));
+  height: var(--line-width);
+  background: var(--color-line);
 }
 
-/* ===== About text ===== */
-.bio {
+.project::after {
+  top: calc(100% + var(--table-line-offset));
+}
+
+/* Hovering a project curls the line under it into a wave, from left to right,
+   and when the mouse leaves the wave stretches back into a straight line.
+   The wavy line is drawn by script.js in this small drawing (svg), which sits exactly
+   on the straight line and replaces it while it moves */
+.project-wave {
   position: absolute;
-  top: var(--bio-top);
+  top: calc(100% + var(--table-line-offset) + (var(--line-width) - var(--wave-box)) / 2); /* centered on the line */
+  left: 0;
+  width: calc(var(--spine-x) - 2 * var(--edge));
+  height: var(--wave-box);
+  overflow: visible;
+  pointer-events: none;
+  fill: none;
+}
+
+.project.is-waving::after {
+  visibility: hidden;
+}
+
+/* Project names turn red on hover, at once, like a piano key: moving down the list
+   lights every row on the way. Leaving, the red fades out quickly. An open project stays red.
+   The name fills the whole row (until the lines end), so no row is skipped */
+.project-name {
+  display: block;
+  width: calc(var(--spine-x) - 2 * var(--edge));
+  padding: 0 0 0 var(--number-column); /* room for the number */
+  transition: color 0.15s linear;
+}
+
+.project-name:hover {
+  transition-duration: 0s;
+}
+
+.project-name:hover,
+.project.is-open {
+  color: var(--color-accent);
+}
+
+/* The project number, in its own column before the name */
+.project-number {
+  position: absolute;
+  left: 0;
+}
+
+/* Clickable names are buttons: remove the browser's button look */
+.project-toggle {
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  border: none;
+}
+
+/* Project text: closed it has no height, open it grows and pushes the next projects down.
+   Its lines are closer (22px) than the project names (25px), so it reads comfortably */
+.project-details {
+  display: grid;
+  grid-template-rows: 0fr;
+  width: min(var(--details-max-width), calc(var(--spine-x) - 2 * var(--edge)));
+  line-height: var(--line-height-text);
+  transition: grid-template-rows var(--index-time) ease;
+}
+
+.project.is-open .project-details {
+  grid-template-rows: 1fr;
+}
+
+.project-details-inner {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* One empty line before each paragraph and after the last one */
+.project-details p {
+  margin-top: var(--line-height-text);
+}
+
+.project-details p:last-child {
+  margin-bottom: var(--line-height-text);
+}
+
+/* Description paragraph and contact details.
+   Removed until CONTACT is clicked, then fade in like the index.
+   Both use the same font, weight, size and line spacing.
+   Two layouts, depending on how wide the left half is (see the end of this section):
+   - Narrow (spine moved left, the default here): description, an empty line, then the
+     contact details. The block sits on the bottom margin, so the contact details end
+     where the word CONTACT ends, and the description starts in line with INDEX.
+   - Wide enough (spine in the middle): contact details next to the description,
+     both starting in line with INDEX. */
+.about {
+  position: absolute;
+  bottom: var(--label-edge);
   left: var(--edge);
   width: var(--bio-width);
   font-size: var(--size-body);
-  line-height: normal;
+  line-height: var(--line-height-about);
+
+  display: none;
+  opacity: 0;
+  transform: translateY(var(--index-rise));
+  transition:
+    opacity var(--index-time) ease,
+    transform var(--index-time) ease;
 }
 
-/* ===== Vertical labels, read top to bottom ===== */
+.about.is-shown {
+  display: block;
+}
+
+.about.is-open {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.contact {
+  margin-top: 1lh; /* one empty line, the height of one line of this text */
+  font-style: normal;
+}
+
+.contact a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Side by side when the spine is in the middle (the left half is 700px wide).
+   The description stays exactly where it is in the other layout (in line with INDEX).
+   The contact details start at the middle of the left half:
+   the middle point of the red lines in the table. */
+@container left-half (min-width: 700px) {
+  .about {
+    top: calc(100% - var(--index-from-bottom));
+    bottom: auto;
+  }
+
+  .contact {
+    position: absolute;
+    top: 0;
+    left: calc(50cqw - var(--edge)); /* 50cqw = half the width of the left half */
+    width: var(--contact-width);
+    margin-top: 0;
+  }
+}
+
+/* ===== Vertical labels on the spine, read top to bottom ===== */
 .side-label {
   position: absolute;
-  left: calc(50% - 9px);
+  z-index: 1; /* above the spine, so INDEX can be clicked */
+  left: calc(var(--spine-x) + var(--label-inset));
   writing-mode: vertical-rl;
   font-family: var(--font-main);
   font-size: var(--size-label);
@@ -145,14 +382,45 @@ body {
   line-height: normal;
   color: var(--color-text);
   white-space: nowrap;
-}
 
-/* INDEX is a button: remove the browser's button look */
-button.side-label {
+  /* The labels are buttons: remove the browser's button look */
   background: none;
   border: none;
   padding: 0;
-  cursor: pointer;
+  user-select: none; /* never highlighted, like the spine itself */
+}
+
+/* Red underline: the same thickness as the lines in the projects table,
+   a little away from the text, as long as the word.
+   The words are written top to bottom, so "under" the word is its left side. */
+.side-label::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(-1 * (var(--line-offset) + var(--line-width)));
+  width: var(--line-width);
+  background: var(--color-accent);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* INDEX and CONTACT keep the straight underline while they are open.
+   On hover a wavy underline is drawn instead, by script.js (see .side-label-wave) */
+.side-label.is-active::after {
+  opacity: 1;
+}
+
+/* Hovered label: the wavy underline, drawn by script.js on the same place as the straight one */
+.side-label-wave {
+  position: absolute;
+  top: 0;
+  left: calc(-1 * (var(--line-offset) + var(--line-width)) + (var(--line-width) - var(--wave-box)) / 2); /* centered on the line */
+  width: var(--wave-box);
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  fill: none;
 }
 
 .side-label--name {
@@ -160,81 +428,497 @@ button.side-label {
 }
 
 .side-label--index {
-  bottom: var(--index-bottom);
+  top: calc(100% - var(--index-from-bottom)); /* in line with the top of the about text */
 }
 
 .side-label--contact {
   bottom: var(--label-edge);
 }
 
-/* ===== Index grid ===== */
-.index-grid {
+/* ===== Right half content: index grid and case study ===== */
+/* Both sit in the same place inside the right half. Only the open one is shown.
+   script.js adds two classes, one after the other:
+   - "is-shown": the content is on the page (closed content is removed, so there is nothing to scroll)
+   - "is-open": the content fades in and moves up into place */
+.index-grid,
+.case {
   position: absolute;
   top: var(--index-top);
-  left: var(--index-left);
-  display: grid;
-  grid-template-columns: repeat(4, var(--thumb-width));
-  grid-auto-rows: var(--index-row);
-  column-gap: var(--index-gap);
+  left: var(--index-gap);
+  width: calc(100% - var(--index-gap) - var(--index-right)); /* the gaps on both sides never change */
 
-  /* Closed: invisible and a little lower */
+  /* Closed: removed, invisible and a little lower */
+  display: none;
   opacity: 0;
-  visibility: hidden;
   transform: translateY(var(--index-rise));
   transition:
     opacity var(--index-time) ease,
-    transform var(--index-time) ease,
-    visibility 0s linear var(--index-time); /* hide only after fading out */
+    transform var(--index-time) ease;
 }
 
-/* Open: fades in and moves up into place */
-.is-index-open .index-grid {
+.index-grid.is-open,
+.case.is-open {
   opacity: 1;
-  visibility: visible;
   transform: translateY(0);
-  transition:
-    opacity var(--index-time) ease,
-    transform var(--index-time) ease,
-    visibility 0s;
 }
 
+/* ===== Index grid ===== */
+/* The columns fill the space exactly, so the space between images stays 12px
+   and the space on both sides stays 16px.
+   The number of columns depends on how wide the right half is: each column is at least 124px,
+   and there are never more than 7.
+   With the spine in the middle there are 5 columns of exactly 124px ("Desktop - 40"). */
+.index-grid {
+  --columns: 1;
+  top: var(--grid-top);
+  left: var(--grid-side);
+  width: calc(100% - 2 * var(--grid-side));
+  grid-template-columns: repeat(var(--columns), 1fr);
+  column-gap: var(--grid-gap);
+  align-items: start;
+}
+
+/* Right half width needed for each number of columns: 136px per column + 20px */
+@container right-half (min-width: 292px) { .index-grid { --columns: 2; } }
+@container right-half (min-width: 428px) { .index-grid { --columns: 3; } }
+@container right-half (min-width: 564px) { .index-grid { --columns: 4; } }
+@container right-half (min-width: 700px) { .index-grid { --columns: 5; } }
+@container right-half (min-width: 836px) { .index-grid { --columns: 6; } }
+@container right-half (min-width: 972px) { .index-grid { --columns: 7; } }
+
+.index-grid.is-shown {
+  display: grid;
+}
+
+/* Each cell keeps the Figma row rhythm: a new row every 230px when the column is 124px */
+.index-item {
+  aspect-ratio: var(--index-cell-ratio);
+}
+
+/* The whole image, in its own proportions: the same image and crop as on the project page.
+   Every cell has the same size (from --index-cell-ratio), so the grid and the gaps stay fixed */
 .index-item img {
   display: block;
-  width: var(--thumb-width);
-  height: var(--thumb-height);
+  width: 100%;
+  height: auto;
+}
+
+/* Number above the image */
+.index-item figcaption {
+  height: var(--caption-height);
+  font-size: var(--size-body);
+  line-height: var(--line-height-text);
+}
+
+/* ===== Case study ===== */
+/* A column of images. It gets wider when the spine moves left.
+   No maximum width: the space from the screen edge always stays the same */
+.case {
+  max-width: none;
+  flex-direction: column;
+  gap: var(--case-gap);
+  padding-bottom: var(--label-edge); /* at the end of the scroll, the last image sits on the bottom margin */
+}
+
+.case.is-shown {
+  display: flex;
+}
+
+/* Opening waits until the project text has finished opening */
+.case.is-open {
+  transition:
+    opacity var(--index-time) ease var(--index-time),
+    transform var(--index-time) ease var(--index-time);
+}
+
+/* Booklet video */
+.case-video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 669 / 466;
   object-fit: cover;
 }
 
-.index-item--tall img {
-  height: var(--thumb-tall);
-}
-
-.index-item figcaption {
-  font-size: var(--size-body);
-  line-height: var(--line-height-list);
-}
-
-/* Frame that shows only the middle of a slightly bigger image */
-.index-crop {
+/* Booklet photo frame. Its height follows its width */
+.case-photo {
   position: relative;
-  width: var(--thumb-width);
-  height: var(--thumb-tall);
-  overflow: hidden;
+  aspect-ratio: 668.33 / 474;
+  container-type: inline-size; /* lets the inside use the frame's width (cqw) */
+  --frame-ratio: calc(474 / 668.33); /* height divided by width */
 }
 
-.index-crop img {
+.case-photo--tall {
+  aspect-ratio: 668.61 / 488;
+  --frame-ratio: calc(488 / 668.61);
+}
+
+/* The photo is standing up, so it is turned 90° to lie on its side */
+.case-photo-frame {
   position: absolute;
-  top: -5.38%;
-  left: -4.39%;
-  width: 108.73%;
-  height: 108.7%;
+  top: 50%;
+  left: 50%;
+  width: calc(100cqw * var(--frame-ratio));
+  height: 100cqw;
+  overflow: hidden;
+  transform: translate(-50%, -50%) rotate(90deg);
+}
+
+/* Zoom and position of each photo come from the numbers in index.html */
+.case-photo-frame img {
+  position: absolute;
+  top: var(--crop-y);
+  left: var(--crop-x);
+  width: var(--crop-w);
+  height: var(--crop-h);
   max-width: none;
+}
+
+/* Poster: a little narrower, on the right, with a thin black outline */
+.case-poster {
+  align-self: flex-end;
+  width: calc(100% * 606 / 669);
+  aspect-ratio: 606 / 860;
+  object-fit: cover;
+  border: 0.5px solid var(--color-text);
+}
+/* Website screenshot: cut to its Figma frame (size from --box in index.html) */
+.case-screen {
+  display: block;
+  width: 100%;
+  aspect-ratio: var(--box);
+  object-fit: cover;
+}
+
+/* A whole photo, full width, in its own proportions */
+.case-image {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* A standing (portrait) photo: never taller than the space between the top and bottom
+   margins, so it can be seen whole without scrolling. On the right, on the side margin. */
+.case-image--portrait {
+  align-self: flex-end;
+  width: auto;
+  max-width: 100%;
+  max-height: calc(100vh - 2 * var(--label-edge));
+  max-height: calc(100dvh - 2 * var(--label-edge));
 }
 
 /* People who turn off animations in their system settings see no motion */
 @media (prefers-reduced-motion: reduce) {
   .index-grid,
-  .is-index-open .index-grid {
+  .case,
+  .case.is-open,
+  .project-details,
+  .project-name,
+  .about,
+  .side-label::after {
     transition: none;
+  }
+}
+
+/* ===== Phone only parts: hidden on bigger screens ===== */
+.projects-toggle,
+.project-year,
+.case-number {
+  display: none;
+}
+
+/* ===== Phone (Figma frames "iPhone 16 & 17 Pro - 1" to "- 5") =====
+   The spine lies across the screen: the table of projects is above it,
+   the images below it. Drag the spine up (or tap ✕) to see only the images */
+
+/* Lets the spine glide up and down when ✕ or + is tapped */
+@property --spine-y {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+@media (max-width: 600px) {
+  :root {
+    --m-edge: 10px;             /* space from the left and right screen edges */
+    --m-size: 14px;             /* table of projects, its text and the contact details */
+    --number-column: 31px;      /* 8 spaces at 14px, like in Figma */
+    --m-spine-height: 30px;     /* the white strip with the labels */
+    --m-spine-top-min: 102px;   /* the spine moved up: only the title and the open project show */
+    --m-label-gap: 20px;        /* space between INDEX and CONTACT */
+    --m-content-top: 12px;      /* from the spine to the first number below it */
+    --m-grid-gap: 11px;         /* index: space between two images side by side */
+    --m-row-gap: 7px;           /* space under each image, before the next number */
+    --spine-y: calc(50vh - var(--m-spine-height) / 2); /* top of the spine, starts in the middle */
+    --spine-y: calc(50dvh - var(--m-spine-height) / 2);
+    transition: --spine-y var(--index-time) ease;
+  }
+
+  /* While a finger drags the spine it follows at once */
+  :root.is-dragging {
+    transition: none;
+  }
+
+  /* Top part: from the screen top to the spine */
+  .pane--left {
+    width: 100%;
+    height: var(--spine-y);
+  }
+
+  /* Bottom part: from the spine to the screen bottom */
+  .pane--right {
+    top: calc(var(--spine-y) + var(--m-spine-height));
+    left: 0;
+    height: auto;
+    bottom: 0;
+  }
+
+  .spine {
+    top: var(--spine-y);
+    left: 0;
+    width: 100%;
+    height: var(--m-spine-height);
+  }
+
+  /* Pink bands above and under the spine, the pink side facing it */
+  .band {
+    left: 0;
+    width: 100%;
+    height: var(--band-width);
+  }
+
+  .band--left {
+    top: calc(var(--spine-y) - var(--band-width));
+  }
+
+  .band--right {
+    top: calc(var(--spine-y) + var(--m-spine-height));
+  }
+
+  .band img,
+  .band--left img {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: none;
+  }
+
+  .band--left img {
+    transform: scaleY(-1);
+  }
+
+  /* Labels in one row inside the spine: the name on the left, INDEX and CONTACT on the right */
+  .side-nav {
+    position: fixed;
+    z-index: 1;
+    top: var(--spine-y);
+    left: var(--m-edge);
+    right: var(--m-edge);
+    height: var(--m-spine-height);
+    display: flex;
+    align-items: center;
+    gap: var(--m-label-gap);
+    pointer-events: none; /* the empty parts of the strip belong to the spine, for dragging */
+  }
+
+  .side-label {
+    position: relative;
+    top: auto;
+    left: auto;
+    bottom: auto;
+    writing-mode: horizontal-tb;
+    pointer-events: auto;
+  }
+
+  .side-label--name {
+    margin-right: auto;
+  }
+
+  /* The underline is under the word */
+  .side-label::after {
+    top: 100%;
+    bottom: auto;
+    left: 0;
+    width: 100%;
+    height: var(--line-width);
+  }
+
+  .side-label-wave {
+    top: calc(100% + (var(--line-width) - var(--wave-box)) / 2);
+    left: 0;
+    width: 100%;
+    height: var(--wave-box);
+  }
+
+  /* ----- Table of projects ----- */
+  .projects {
+    position: relative;
+    top: auto;
+    left: auto;
+    margin: var(--edge) var(--m-edge) 0;
+    font-size: var(--m-size);
+  }
+
+  .project-list::before,
+  .project::after,
+  .project-name,
+  .project-wave,
+  .project-details {
+    width: 100%;
+  }
+
+  /* —, ✕ and + on the right of the title, in the same place.
+     ✕ turned by 45° is +, so it turns between the two */
+  .projects-toggle {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: var(--line-height-table);
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: none;
+  }
+
+  .toggle-dash,
+  .toggle-cross {
+    display: block;
+    transition:
+      opacity var(--index-time) ease,
+      transform var(--index-time) ease;
+  }
+
+  .toggle-cross {
+    position: absolute;
+    top: 0;
+    right: 0;
+    opacity: 0;
+  }
+
+  /* A project or the index is open: ✕ */
+  .page:has(.project.is-open, .index-grid.is-open) .toggle-dash {
+    opacity: 0;
+  }
+
+  .page:has(.project.is-open, .index-grid.is-open) .toggle-cross {
+    opacity: 1;
+  }
+
+  /* Only the images: + */
+  .is-collapsed .toggle-cross {
+    transform: rotate(45deg);
+  }
+
+  /* The other projects fold away smoothly while one is open,
+     and all of them while only the images are shown */
+  .project-name {
+    height: var(--line-height-table);
+    transition:
+      color 0.15s linear,
+      height var(--index-time) ease;
+  }
+
+  .project {
+    transition: opacity var(--index-time) ease;
+  }
+
+  .project-list:has(.is-open) .project:not(.is-open),
+  .is-collapsed .project:not(.is-open) {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .project-list:has(.is-open) .project:not(.is-open) .project-name,
+  .is-collapsed .project:not(.is-open) .project-name {
+    height: 0;
+  }
+
+  /* The open project has no line under it */
+  .project::after {
+    transition: opacity var(--index-time) ease;
+  }
+
+  .project.is-open::after {
+    opacity: 0;
+  }
+
+  /* Year, on the right of the open project, in black */
+  .project-year {
+    display: block;
+    position: absolute;
+    top: 0;
+    right: 0;
+    color: var(--color-text);
+    opacity: 0;
+    transition: opacity var(--index-time) ease;
+  }
+
+  .project.is-open .project-year {
+    opacity: 1;
+  }
+
+  /* Description: an empty line before and after it */
+  .project-details {
+    line-height: normal;
+  }
+
+  .project-details p {
+    margin-top: 1lh;
+  }
+
+  .project-details p:last-child {
+    margin-bottom: 1lh;
+  }
+
+  /* Only the images: the description folds away too */
+  .is-collapsed .project.is-open .project-details {
+    grid-template-rows: 0fr;
+  }
+
+  /* Contact details: under the table */
+  .about {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    width: auto;
+    margin: var(--line-height-table) var(--m-edge) var(--edge);
+    font-size: var(--m-size);
+    line-height: normal;
+  }
+
+  /* ----- Under the spine: index and project images ----- */
+  .index-grid,
+  .case {
+    top: var(--m-content-top);
+    left: var(--m-edge);
+    width: calc(100% - 2 * var(--m-edge));
+  }
+
+  /* Index: always 3 columns, each row as tall as its tallest image */
+  .index-grid {
+    --columns: 3;
+    column-gap: var(--m-grid-gap);
+    row-gap: var(--m-row-gap);
+  }
+
+  .index-item {
+    aspect-ratio: auto;
+  }
+
+  /* Project images: one under the other, each with its number above it, like the index */
+  .case {
+    gap: 0;
+  }
+
+  .case-number {
+    display: block;
+    height: var(--caption-height);
+    font-size: var(--size-body);
+    line-height: var(--line-height-text);
+  }
+
+  .case-number:not(:first-child) {
+    margin-top: var(--m-row-gap);
   }
 }
