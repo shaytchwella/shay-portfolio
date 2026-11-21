@@ -365,7 +365,6 @@ function resetSpine() {
 // ----- Phone: up and down -----
 const projectsToggle = document.querySelector(".projects-toggle");
 const SPINE_SNAP = 40;            // let go this close to the top: only the images are shown
-const SPINE_LOWEST = 0.75;        // the spine never goes lower than 3/4 of the screen
 
 function spineTopMin() {
   return parseFloat(getComputedStyle(root).getPropertyValue("--m-spine-top-min"));
@@ -399,8 +398,10 @@ projectsToggle.addEventListener("click", () => {
   }
 });
 
+// The spine goes up to --m-spine-top-min, and down only back to where it started: the middle
 function moveSpineY(y) {
-  const lowest = window.innerHeight * SPINE_LOWEST;
+  const spineHeight = parseFloat(getComputedStyle(root).getPropertyValue("--m-spine-height"));
+  const lowest = window.innerHeight / 2 - spineHeight / 2;
   const top = Math.min(Math.max(y, spineTopMin()), lowest);
   root.style.setProperty("--spine-y", top + "px");
   return top;
@@ -414,6 +415,13 @@ spine.addEventListener("pointerdown", (event) => {
   const grabOffset = phone.matches ? event.clientY - box.top : event.clientX - box.left;
   spine.setPointerCapture(event.pointerId);
   root.classList.add("is-dragging");
+
+  // Phone: dragging down from the top brings the text back while the spine moves
+  // (it fades in from the pink band). Let go near the top again and it folds away again
+  if (phone.matches && root.classList.contains("is-collapsed")) {
+    root.classList.remove("is-collapsed");
+    projectsToggle.setAttribute("aria-label", "Show only the images");
+  }
 
   // The mouse can report many moves between two screen refreshes.
   // Move the spine once per refresh, to the latest position, so the motion stays smooth.
@@ -442,14 +450,12 @@ spine.addEventListener("pointerdown", (event) => {
     root.classList.remove("is-dragging");
     window.getSelection().removeAllRanges(); // clear any highlight left over
 
-    // Phone: pushed up near the top, it settles there and only the images are shown.
-    // Pulled down from there, the text comes back where the spine was left
-    if (phone.matches && lastTop !== null) {
-      if (somethingOpen() && lastTop < spineTopMin() + SPINE_SNAP) {
+    // Phone: pushed up near the top, it settles there and only the images are shown
+    // (also after a tap on the spine without moving it)
+    if (phone.matches) {
+      const top = lastTop !== null ? lastTop : spine.getBoundingClientRect().top;
+      if (somethingOpen() && top < spineTopMin() + SPINE_SNAP) {
         showOnlyImages();
-      } else if (root.classList.contains("is-collapsed")) {
-        root.classList.remove("is-collapsed");
-        projectsToggle.setAttribute("aria-label", "Show only the images");
       }
     }
   }

@@ -255,13 +255,16 @@ body {
   transition: color 0.15s linear;
 }
 
-.project-name:hover {
-  transition-duration: 0s;
-}
-
-.project-name:hover,
 .project.is-open {
   color: var(--color-accent);
+}
+
+/* Only where there is a real mouse: on a touch screen a tapped name would stay red */
+@media (hover: hover) {
+  .project-name:hover {
+    color: var(--color-accent);
+    transition-duration: 0s;
+  }
 }
 
 /* The project number, in its own column before the name */
@@ -643,7 +646,7 @@ body {
     --m-size: 14px;             /* table of projects, its text and the contact details */
     --number-column: 31px;      /* 8 spaces at 14px, like in Figma */
     --m-spine-height: 30px;     /* the white strip with the labels */
-    --m-spine-top-min: 102px;   /* the spine moved up: only the title and the open project show */
+    --m-spine-top-min: 81px;    /* the spine moved up as far as it goes: only the title and the open project show */
     --m-label-gap: 20px;        /* space between INDEX and CONTACT */
     --m-content-top: 12px;      /* from the spine to the first number below it */
     --m-grid-gap: 11px;         /* index: space between two images side by side */
@@ -658,10 +661,17 @@ body {
     transition: none;
   }
 
-  /* Top part: from the screen top to the spine */
+  /* Top part: from the screen top to the spine.
+     Its text fades out into the pink band above the spine, so while the spine is pushed up
+     the description disappears little by little. The title and the open project's row
+     (the first 2 rows) never fade: the fade gets shorter as the spine comes close to them */
   .pane--left {
+    --fade: clamp(0px, calc(var(--spine-y) - var(--edge) - 2 * var(--line-height-table)), var(--band-width));
     width: 100%;
     height: var(--spine-y);
+    padding-bottom: var(--band-width); /* lets the last lines scroll up out of the fade */
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade)), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - var(--fade)), transparent);
   }
 
   /* Bottom part: from the spine to the screen bottom */
@@ -767,8 +777,8 @@ body {
     width: 100%;
   }
 
-  /* —, ✕ and + on the right of the title, in the same place.
-     ✕ turned by 45° is +, so it turns between the two */
+  /* + and ✕ on the right of the title. ✕ turned by 45° is +, so it turns between the two:
+     + when nothing is open, ✕ when a project or the index is open, + again for only the images */
   .projects-toggle {
     display: block;
     position: absolute;
@@ -781,37 +791,27 @@ body {
     border: none;
   }
 
-  .toggle-dash,
   .toggle-cross {
     display: block;
-    transition:
-      opacity var(--index-time) ease,
-      transform var(--index-time) ease;
-  }
-
-  .toggle-cross {
-    position: absolute;
-    top: 0;
-    right: 0;
-    opacity: 0;
-  }
-
-  /* A project or the index is open: ✕ */
-  .page:has(.project.is-open, .index-grid.is-open) .toggle-dash {
-    opacity: 0;
+    transform: rotate(45deg);
+    transition: transform var(--index-time) ease;
   }
 
   .page:has(.project.is-open, .index-grid.is-open) .toggle-cross {
-    opacity: 1;
+    transform: rotate(0deg);
   }
 
-  /* Only the images: + */
-  .is-collapsed .toggle-cross {
+  .is-collapsed .page:has(.project.is-open, .index-grid.is-open) .toggle-cross {
     transform: rotate(45deg);
   }
 
-  /* The other projects fold away smoothly while one is open,
-     and all of them while only the images are shown */
+  /* The other projects fold away while one is open, and all of them while only the
+     images are shown. Each row closes like a window blind: it gets shorter until its line
+     joins the line above it */
+  .project {
+    overflow: hidden;
+  }
+
   .project-name {
     height: var(--line-height-table);
     transition:
@@ -819,13 +819,8 @@ body {
       height var(--index-time) ease;
   }
 
-  .project {
-    transition: opacity var(--index-time) ease;
-  }
-
   .project-list:has(.is-open) .project:not(.is-open),
   .is-collapsed .project:not(.is-open) {
-    opacity: 0;
     pointer-events: none;
   }
 
@@ -835,10 +830,6 @@ body {
   }
 
   /* The open project has no line under it */
-  .project::after {
-    transition: opacity var(--index-time) ease;
-  }
-
   .project.is-open::after {
     opacity: 0;
   }
@@ -885,6 +876,7 @@ body {
     margin: var(--line-height-table) var(--m-edge) var(--edge);
     font-size: var(--m-size);
     line-height: normal;
+    scroll-margin-bottom: var(--band-width); /* brought into view above the fade */
   }
 
   /* ----- Under the spine: index and project images ----- */
