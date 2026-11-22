@@ -374,7 +374,7 @@ function somethingOpen() {
   return indexGrid.classList.contains("is-open") || openProjectButton() !== undefined;
 }
 
-// Only the images: the spine goes up and the text above it folds away (✕ turns into +)
+// Only the images: the spine goes up and the text above it closes like a blind (✕ turns into +)
 function showOnlyImages() {
   root.classList.add("is-collapsed");
   root.style.setProperty("--spine-y", spineTopMin() + "px");
@@ -416,8 +416,8 @@ spine.addEventListener("pointerdown", (event) => {
   spine.setPointerCapture(event.pointerId);
   root.classList.add("is-dragging");
 
-  // Phone: dragging down from the top brings the text back while the spine moves
-  // (it fades in from the pink band). Let go near the top again and it folds away again
+  // Phone: dragging down from the top opens the text again like a blind, as the spine moves.
+  // Let go near the top again and it closes again
   if (phone.matches && root.classList.contains("is-collapsed")) {
     root.classList.remove("is-collapsed");
     projectsToggle.setAttribute("aria-label", "Show only the images");
@@ -465,8 +465,54 @@ spine.addEventListener("pointerdown", (event) => {
   spine.addEventListener("pointercancel", onUp);
 });
 
-// ===== Phone: a number above each project image, like in the index =====
+// ===== Phone: the edge of the blind =====
+// The text above the spine is cut off a little above it (styles.css). While the cut goes
+// through a project's row, a red line rides along the cut, so the row closes like a blind slat.
+const leftHalf = document.querySelector(".pane--left");
+const foldLine = document.createElement("div");
+foldLine.className = "fold-line";
+foldLine.setAttribute("aria-hidden", "true");
+leftHalf.appendChild(foldLine);
+
+function placeFoldLine() {
+  if (!phone.matches) return;
+  // Same as --m-fold-gap: with the spine all the way up, the cut is at the title's line
+  const titleBottom = document.querySelector(".projects-head").getBoundingClientRect().bottom;
+  const cut = leftHalf.getBoundingClientRect().bottom - (spineTopMin() - titleBottom);
+  const lineWidth = cssNumber("--line-width");
+  const cutRow = [...document.querySelectorAll(".project-name")].some((name) => {
+    const row = name.getBoundingClientRect();
+    return row.top < cut && cut < row.bottom - lineWidth;
+  });
+  foldLine.style.visibility = cutRow ? "visible" : "hidden";
+  foldLine.style.top = cut - lineWidth + "px";
+}
+
+// Keep the line in place while things move (dragging, scrolling, animations), then stop
+let foldLineUntil = 0;
+let foldLineFrame = null;
+function followFoldLine() {
+  foldLineUntil = performance.now() + ANIMATION_MS + 100;
+  if (foldLineFrame !== null) return;
+  const step = () => {
+    placeFoldLine();
+    foldLineFrame = performance.now() < foldLineUntil ? requestAnimationFrame(step) : null;
+  };
+  foldLineFrame = requestAnimationFrame(step);
+}
+
+leftHalf.addEventListener("scroll", followFoldLine, { passive: true });
+document.addEventListener("transitionrun", followFoldLine);
+document.addEventListener("pointermove", () => {
+  if (root.classList.contains("is-dragging")) followFoldLine();
+});
+window.addEventListener("resize", followFoldLine);
+placeFoldLine();
+
+// ===== A number above each project image, like in the index =====
 // The number is the project's number, then the image's place: 1.01, 1.02...
+// A standing image sits on the right: its number moves with it and starts where it starts.
+// styles.css works out the number's width from the image's proportions (--ratio)
 document.querySelectorAll(".case").forEach((images) => {
   const button = document.querySelector(`[aria-controls="${images.id}"]`);
   const projectNumber = button.querySelector(".project-number").textContent;
@@ -475,6 +521,15 @@ document.querySelectorAll(".case").forEach((images) => {
     number.className = "case-number";
     number.textContent = `${projectNumber}.${String(place + 1).padStart(2, "0")}`;
     images.insertBefore(number, image);
+
+    if (image.classList.contains("case-poster")) {
+      number.classList.add("case-number--poster");
+    } else if (image.classList.contains("case-image--portrait")) {
+      number.classList.add("case-number--portrait");
+      const setRatio = () => number.style.setProperty("--ratio", image.naturalWidth / image.naturalHeight);
+      if (image.complete) setRatio();
+      image.addEventListener("load", setRatio);
+    }
   });
 });
 
