@@ -649,8 +649,7 @@ body {
 
 /* ===== Phone only parts: hidden on bigger screens ===== */
 .projects-toggle,
-.project-year,
-.fold-line {
+.project-year {
   display: none;
 }
 
@@ -678,10 +677,7 @@ body {
     --m-row-gap: 7px;           /* space under each image, before the next number */
     --m-fold-time: 420ms;       /* rows and descriptions open and close like a window blind */
     --m-text-fade: 260ms;       /* ...while their text fades a little faster */
-    --m-head-height: calc(var(--edge) + var(--line-height-table)); /* the title row, down to its line */
-    /* The text above the spine is cut off this far above it, so with the spine all the way up
-       (--m-spine-top-min) only the title row is left */
-    --m-fold-gap: calc(var(--m-spine-top-min) - var(--m-head-height));
+    --m-clear-zone: 26px;       /* right above the spine no text is ever seen (one row) */
     --spine-y: calc(50vh - var(--m-spine-height) / 2); /* top of the spine, starts in the middle */
     --spine-y: calc(50dvh - var(--m-spine-height) / 2);
     transition: --spine-y var(--index-time) ease;
@@ -693,27 +689,19 @@ body {
   }
 
   /* Top part: from the screen top to the spine.
-     Its text is cut off sharply --m-fold-gap above the spine. So the text closes like a
-     window blind exactly as fast as the spine goes up, and opens again as it comes down.
-     With the spine all the way up only the title row is left */
+     Its text fades out into the pink band above the spine, so while the spine is pushed up
+     the description disappears little by little, and right above the spine (--m-clear-zone)
+     nothing shows at all. The title and the open project's row (the first 2 rows) never fade:
+     the fade gets shorter as the spine comes close to them */
   .pane--left {
+    --keep: calc(var(--edge) + 2 * var(--line-height-table)); /* bottom of the open project's row */
+    --fade-start: max(var(--keep), calc(100% - var(--band-width)));
+    --fade-end: max(calc(var(--keep) + 1px), calc(100% - var(--m-clear-zone)));
     width: 100%;
     height: var(--spine-y);
-    padding-bottom: var(--m-fold-gap); /* lets the last lines scroll up above the cut */
-    clip-path: inset(0 0 var(--m-fold-gap) 0);
-    overscroll-behavior: contain; /* scrolling past the end doesn't drag the whole page */
-  }
-
-  /* The edge of the blind: while the cut goes through a project's row, a red line rides
-     along it, like the row's own line pulled up (placed by script.js) */
-  .fold-line {
-    display: block;
-    position: fixed;
-    left: var(--m-edge);
-    right: var(--m-edge);
-    height: var(--line-width);
-    background: var(--color-line);
-    pointer-events: none;
+    padding-bottom: var(--band-width); /* lets the last lines scroll up out of the fade */
+    -webkit-mask-image: linear-gradient(to bottom, #000 var(--fade-start), transparent var(--fade-end));
+    mask-image: linear-gradient(to bottom, #000 var(--fade-start), transparent var(--fade-end));
   }
 
   /* Bottom part: from the spine to the screen bottom */
@@ -803,19 +791,17 @@ body {
   }
 
   /* ----- Table of projects ----- */
-  /* The title row and its line never move: they are fixed to the top of the screen.
-     The projects scroll under them and disappear when they reach the line */
+  /* The title row and its line stay at the top of the top part. The projects scroll under
+     them and disappear when they reach the line */
   .projects {
     display: contents; /* lets the title stay put for the whole top part, contact details too */
     font-size: var(--m-size);
   }
 
   .projects-head {
-    position: fixed;
+    position: sticky;
     z-index: 1;
     top: 0;
-    left: 0;
-    right: 0;
     padding: var(--edge) var(--m-edge) 0;
     font-size: var(--m-size);
     line-height: var(--line-height-table);
@@ -838,7 +824,7 @@ body {
   }
 
   .project-list {
-    margin: var(--m-head-height) var(--m-edge) 0; /* starts under the fixed title row */
+    margin: 0 var(--m-edge);
     font-size: var(--m-size);
     line-height: var(--line-height-table);
   }
@@ -879,7 +865,8 @@ body {
     transform: rotate(45deg);
   }
 
-  /* The other projects fold away while one is open. Each row closes like a window blind: it gets shorter until its line
+  /* The other projects fold away while one is open, and all of them while only the
+     images are shown. Each row closes like a window blind: it gets shorter until its line
      joins the line above it */
   .project {
     overflow: hidden;
@@ -893,13 +880,19 @@ body {
       opacity var(--m-text-fade) ease;
   }
 
-  .project-list:has(.is-open) .project:not(.is-open) {
+  .project-list:has(.is-open) .project:not(.is-open),
+  .is-collapsed .project:not(.is-open) {
     pointer-events: none;
   }
 
-  .project-list:has(.is-open) .project:not(.is-open) .project-name {
-    height: 0;
+  .project-list:has(.is-open) .project:not(.is-open) .project-name,
+  .is-collapsed .project:not(.is-open) .project-name {
     opacity: 0;
+  }
+
+  .project-list:has(.is-open) .project:not(.is-open) .project-name,
+  .is-collapsed .project:not(.is-open) .project-name {
+    height: 0;
   }
 
   /* The open project has no line under it */
@@ -938,12 +931,21 @@ body {
     opacity: 1;
   }
 
+  .is-collapsed .project.is-open .project-details-inner {
+    opacity: 0;
+  }
+
   .project-details p {
     margin-top: 1lh;
   }
 
   .project-details p:last-child {
     margin-bottom: 1lh;
+  }
+
+  /* Only the images: the description folds away too */
+  .is-collapsed .project.is-open .project-details {
+    grid-template-rows: 0fr;
   }
 
   /* Contact details: under the table */
@@ -955,7 +957,7 @@ body {
     margin: var(--line-height-table) var(--m-edge) var(--edge);
     font-size: var(--m-size);
     line-height: normal;
-    scroll-margin-bottom: var(--m-fold-gap); /* brought into view above the cut */
+    scroll-margin-bottom: var(--band-width); /* brought into view above the fade */
   }
 
   /* ----- Under the spine: index and project images ----- */
