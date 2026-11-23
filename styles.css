@@ -32,6 +32,7 @@
   --bio-width: 328px;
   --contact-width: 327px;
   --line-width: 0.8px;        /* thickness of the red lines in the table */
+  --contact-line-raise: 2px;  /* contact details: their underline is raised this much, close to the word */
   --line-offset: 1.2px;       /* side labels: the red underline sits a little away from the word */
   --table-line-offset: -0.8px; /* projects table: each red line sits right on the bottom edge of its row */
   --wave-length: 14px;        /* hovered project or label: one wave of its wavy line */
@@ -53,12 +54,18 @@
   --grid-gap: 12px;           /* index: space between two images side by side */
   --caption-height: 23px;     /* index: number above each image, the image starts right after it */
   --index-cell-ratio: 124 / 230; /* column width / distance from one row to the next */
+  --intro-width: 124px;       /* opening screen: width of the images */
+  --intro-narrow-width: 79px; /* opening screen: width of the standing posters */
+  --intro-gap: 20px;          /* opening screen: space between the images */
+  --lens-size: 240px;         /* pressing a project image: the big square that shows it up close */
+  --lens-zoom: 2.5;           /* how much bigger the image is inside the square */
   --case-gap: 15px;           /* space between case study images */
 
   /* Cursors from Figma. The two numbers are the cursor's point: the middle of each shape */
+  /* All three are 20 × 20 */
   --cursor-left: url("images/cursor-circle.svg") 10 10, auto;   /* left half */
-  --cursor-spine: url("images/cursor-arrows.svg") 12 12, col-resize; /* the spine */
-  --cursor-right: url("images/cursor-square.svg") 9 9, auto;    /* right half (images) */
+  --cursor-spine: url("images/cursor-spine.svg") 11 10, col-resize; /* the spine (a little wider: the space between the arrows) */
+  --cursor-right: url("images/cursor-square.svg") 10 10, auto;  /* right half (images) */
 
   /* Index animation */
   --index-time: 0.6s;
@@ -354,6 +361,45 @@ body {
   text-decoration: none;
 }
 
+/* Each contact detail on its own: on hover it turns red with a wavy underline,
+   like the labels on the spine (the wave is drawn by script.js, see .contact-wave).
+   Clicking copies it, and it shows "copied" with a straight red underline */
+.contact-link {
+  position: relative;
+  display: inline-block;
+}
+
+@media (hover: hover) {
+  .contact-link:hover {
+    color: var(--color-accent);
+  }
+}
+
+.contact-link.is-copied {
+  color: var(--color-accent);
+}
+
+.contact-link.is-copied::after {
+  content: "";
+  position: absolute;
+  top: calc(100% - var(--contact-line-raise));
+  left: 0;
+  width: 100%;
+  height: var(--line-width);
+  background: var(--color-accent);
+}
+
+.contact-wave {
+  position: absolute;
+  top: calc(100% - var(--contact-line-raise) + (var(--line-width) - var(--wave-box)) / 2); /* centered on the line */
+  left: 0;
+  width: 100%;
+  height: var(--wave-box);
+  overflow: visible;
+  pointer-events: none;
+  fill: none;
+}
+
 /* Side by side when the spine is in the middle (the left half is 700px wide).
    The description stays exactly where it is in the other layout (in line with INDEX).
    The contact details start at the middle of the left half:
@@ -443,6 +489,7 @@ body {
    script.js adds two classes, one after the other:
    - "is-shown": the content is on the page (closed content is removed, so there is nothing to scroll)
    - "is-open": the content fades in and moves up into place */
+.intro,
 .index-grid,
 .case {
   position: absolute;
@@ -459,10 +506,52 @@ body {
     transform var(--index-time) ease;
 }
 
+.intro.is-open,
 .index-grid.is-open,
 .case.is-open {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* ===== Opening screen: a carousel of chosen images =====
+   One column on the right margin, sizes from Figma ("Desktop - 46").
+   It is there when nothing is open, and fades out like the others when something opens.
+   script.js repeats the images and keeps the scroll going round */
+.intro {
+  left: auto;
+  right: var(--index-right); /* on the right margin, like the project images */
+  top: var(--label-edge);    /* the first image starts on the top margin */
+  width: auto;
+}
+
+.intro.is-shown {
+  display: block;
+}
+
+.intro-set {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* every image on the right margin */
+  gap: var(--intro-gap);
+  padding-bottom: var(--intro-gap); /* the same space between one round and the next */
+}
+
+.intro img {
+  display: block;
+  width: var(--intro-width);
+  height: auto;
+}
+
+/* The two standing posters are narrower */
+.intro img.intro-narrow {
+  width: var(--intro-narrow-width);
+}
+
+/* Phone: no opening carousel (for now it is only for the computer) */
+@media (max-width: 600px) {
+  .intro.is-shown {
+    display: none;
+  }
 }
 
 /* ===== Index grid ===== */
@@ -504,6 +593,16 @@ body {
   display: block;
   width: 100%;
   height: auto;
+  max-height: calc(100% - var(--caption-height)); /* a very tall image gets a little narrower, so it stays inside its cell */
+  object-fit: contain;
+  object-position: left top;
+}
+
+/* Computer: an image turns see-through (60%) under the mouse. Clicking it opens its project */
+@media (min-width: 601px) and (hover: hover) {
+  .index-item img:hover {
+    opacity: 0.6;
+  }
 }
 
 /* Number above the image */
@@ -540,6 +639,20 @@ body {
   width: 100%;
   aspect-ratio: 669 / 466;
   object-fit: cover;
+}
+
+/* Miar booklet video: the picture is 3:2, with black bars on both sides inside the file.
+   A 3:2 frame filled by the video hides exactly the bars and nothing of the picture */
+.case-video--miar {
+  aspect-ratio: 3 / 2;
+}
+
+/* Davar video: standing (9:16), on the right like a standing photo (see .case-image--portrait).
+   Its width is set from the most height it may have, so the whole picture always shows */
+.case-video.case-video--standing {
+  aspect-ratio: 9 / 16;
+  width: min(100%, calc((100vh - 2 * var(--label-edge) - var(--caption-height)) * 9 / 16));
+  width: min(100%, calc((100dvh - 2 * var(--label-edge) - var(--caption-height)) * 9 / 16));
 }
 
 /* Booklet photo frame. Its height follows its width */
@@ -622,6 +735,30 @@ body {
   }
 }
 
+/* Pressing a project image: the square cursor grows into a big square that shows
+   the image up close (script.js moves it with the mouse). Its border is like the cursor's */
+.zoom-lens {
+  position: fixed;
+  z-index: 10;
+  display: none;
+  width: var(--lens-size);
+  height: var(--lens-size);
+  overflow: hidden;
+  border: 1px solid var(--color-text);
+  background: var(--color-page);
+  pointer-events: none;
+}
+
+.zoom-lens.is-shown {
+  display: block;
+}
+
+/* While the big square is there it takes the place of the cursor */
+.is-zooming .pane--right,
+.is-zooming .pane--right * {
+  cursor: none;
+}
+
 /* Number above each project image, like in the index (added by script.js).
    Above a standing image on the right, it starts where the image starts */
 .case-number {
@@ -632,6 +769,20 @@ body {
 
 .case-number:not(:first-child) {
   margin-top: var(--case-gap);
+}
+
+/* Computer: the first number sits in the row of "Table of Projects" (same top and line height),
+   and the first image starts on the first red line of the table. The rest stay as they are */
+@media (min-width: 601px) {
+  .case {
+    position: relative; /* all the projects one under the other, so the scroll goes on to the next one */
+    top: var(--edge); /* the top of the title row */
+  }
+
+  .case-number:first-child {
+    height: calc(var(--line-height-table) + var(--table-line-offset)); /* down to the red line */
+    line-height: var(--line-height-table);
+  }
 }
 
 /* Above a standing photo: as wide as the photo (see .case-image--portrait) */

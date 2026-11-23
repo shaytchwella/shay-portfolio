@@ -34,21 +34,53 @@ function hideContent(element) {
   }, ANIMATION_MS);
 }
 
+// ===== Opening screen: a carousel of chosen images (computer) =====
+// The column of images is repeated a few times. The scroll starts on the second round,
+// and whenever it gets near the first or the last round it jumps back by one round,
+// to the same picture, so the images seem to go round without end.
+const intro = document.getElementById("intro");
+const INTRO_ROUNDS = 5; // how many times the column is repeated (enough for a tall screen)
+const firstRound = intro.querySelector(".intro-set");
+for (let round = 1; round < INTRO_ROUNDS; round++) {
+  const copy = firstRound.cloneNode(true);
+  copy.setAttribute("aria-hidden", "true"); // the same images again: screen readers skip them
+  intro.appendChild(copy);
+}
+
+// Height of one round of images (with the space after it)
+function introRoundHeight() {
+  return firstRound.offsetHeight;
+}
+
+function showIntro() {
+  showContent(intro);
+  intro.closest(".pane--right").scrollTop = introRoundHeight();
+}
+
 // ===== Close the index and any open project (not the contact details) =====
 function closeIndexAndProjects() {
+  if (intro.classList.contains("is-open")) {
+    hideContent(intro);
+  }
   if (indexGrid.classList.contains("is-open")) {
     hideContent(indexGrid);
   }
   indexButton.setAttribute("aria-expanded", false);
   indexButton.classList.remove("is-active");
 
-  projectButtons.forEach((button) => {
-    const project = button.closest(".project");
-    if (project.classList.contains("is-open")) {
-      project.classList.remove("is-open");
-      hideContent(document.getElementById(button.getAttribute("aria-controls")));
+  markOpenProject(null);
+  hideCases();
+}
+
+// ===== Project images =====
+// All the case studies, in the order of the table
+const cases = [...document.querySelectorAll(".case")];
+
+function hideCases() {
+  cases.forEach((images) => {
+    if (images.classList.contains("is-open")) {
+      hideContent(images);
     }
-    button.setAttribute("aria-expanded", false);
   });
 }
 
@@ -75,22 +107,47 @@ indexButton.addEventListener("click", () => {
 });
 
 // Projects: the text opens first, then the images.
-// fromEnd: show the images from their last one (when scrolling up from the next project)
-function openProject(button, fromEnd = false) {
-  closeIndexAndProjects();
-  button.closest(".project").classList.add("is-open");
+// On a computer all the projects' images open together, one project after the other,
+// and the right half moves to the chosen one. On a phone only the chosen one opens.
+function openProject(button) {
   const images = document.getElementById(button.getAttribute("aria-controls"));
-  showContent(images);
-  if (fromEnd) {
-    rightHalf.scrollTop = rightHalf.scrollHeight;
+
+  // Computer, images already open: just move to this project, smoothly
+  if (!phone.matches && images.classList.contains("is-open")) {
+    markOpenProject(button);
+    scrollToCase(images, "smooth");
+    return;
   }
-  button.setAttribute("aria-expanded", true);
+
+  closeIndexAndProjects();
+  markOpenProject(button);
+  if (phone.matches) {
+    showContent(images);
+  } else {
+    cases.forEach(showContent);
+    scrollToCase(images, "auto");
+  }
 }
 
-function closeProject(button) {
-  button.closest(".project").classList.remove("is-open");
-  hideContent(document.getElementById(button.getAttribute("aria-controls")));
-  button.setAttribute("aria-expanded", false);
+function closeProject() {
+  markOpenProject(null);
+  hideCases();
+  showIntro(); // nothing is open: the opening images come back
+}
+
+// Opens one project's text in the table and closes the others' (their images stay as they are).
+// null: closes them all
+let scrollProject = null; // the project the scroll is on now (its text may still be waiting to open)
+let waitingToOpen = null;
+
+function markOpenProject(button) {
+  scrollProject = button;
+  clearTimeout(waitingToOpen);
+  projectButtons.forEach((other) => {
+    const isThis = other === button;
+    other.closest(".project").classList.toggle("is-open", isThis);
+    other.setAttribute("aria-expanded", isThis);
+  });
 }
 
 // Clicking a project's name opens it. When it is open, clicking its name
@@ -99,7 +156,7 @@ projectButtons.forEach((button) => {
   const project = button.closest(".project");
   button.addEventListener("click", () => {
     if (project.classList.contains("is-open")) {
-      closeProject(button);
+      closeProject();
       showText(); // phone: nothing is open any more, so the spine goes back to the middle
     } else {
       openProject(button);
@@ -107,53 +164,89 @@ projectButtons.forEach((button) => {
   });
   project.querySelector(".project-details").addEventListener("click", () => {
     if (project.classList.contains("is-open")) {
-      closeProject(button);
+      closeProject();
       showText();
     }
   });
 });
 
-// ===== Scrolling the images on to the next project =====
-// After the last image of a project, scrolling on down opens the next project in the list
-// (its text on the left, its images on the right). Scrolling up from the first image
-// opens the one before it, at its last image.
-// Only a new scroll that starts at the end counts, and it has to push on a little,
-// so the images never jump on by themselves at the end of a fast scroll.
+// ===== Index: clicking an image opens its project =====
+// The number above the image (like 3.05) says which project it belongs to (3).
+// Computer only: the phone keeps the index as it is.
+document.querySelectorAll(".index-item").forEach((item) => {
+  item.addEventListener("click", () => {
+    if (phone.matches) return;
+    const projectNumber = item.querySelector("figcaption").textContent.split(".")[0];
+    const button = [...projectButtons].find(
+      (projectButton) => projectButton.querySelector(".project-number").textContent === projectNumber
+    );
+    if (button) {
+      openProject(button);
+    }
+  });
+});
+
+// ===== Scrolling on from one project to the next (computer) =====
+// The images of all the projects come one after the other, so the scroll goes on
+// from the last image of a project straight into the next one.
+// The table follows: when a project's images reach the middle of the right half,
+// its text opens in the table and the one before closes, the same way as a click.
 const rightHalf = document.querySelector(".pane--right");
-const SCROLL_PUSH = 80;     // how far to push past the end before moving on (pixels)
-const SCROLL_PAUSE_MS = 250; // a break this long between wheel moves starts a new scroll
-let pushed = 0;
-let lastWheel = 0;
-let scrollStartedAtEnd = false;
+const AUTO_SCROLL_MS = 1000; // while the page moves by itself to a clicked project, the table waits
+let autoScrollUntil = 0;
 
 function openProjectButton() {
   return [...projectButtons].find((button) => button.closest(".project").classList.contains("is-open"));
 }
 
-rightHalf.addEventListener("wheel", (event) => {
-  const open = openProjectButton();
-  if (!open || event.ctrlKey) return;
+// Puts the project's first number in its usual place: in the row of "Table of Projects"
+function scrollToCase(images, behavior) {
+  const top = images.offsetTop - parseFloat(getComputedStyle(images).top);
+  autoScrollUntil = performance.now() + (behavior === "smooth" ? AUTO_SCROLL_MS : 0);
+  rightHalf.scrollTo({ top, behavior });
+}
 
-  const atBottom = rightHalf.scrollTop + rightHalf.clientHeight >= rightHalf.scrollHeight - 1;
-  const atTop = rightHalf.scrollTop <= 0;
-  const down = event.deltaY > 0;
-
-  if (event.timeStamp - lastWheel > SCROLL_PAUSE_MS) {
-    pushed = 0;
-    scrollStartedAtEnd = down ? atBottom : atTop;
+// Opening carousel: near the first or the last round, jump back by one round
+rightHalf.addEventListener("scroll", () => {
+  if (!intro.classList.contains("is-open")) return;
+  const round = introRoundHeight();
+  if (rightHalf.scrollTop < round / 2) {
+    rightHalf.scrollTop += round;
+  } else if (rightHalf.scrollTop > round * (INTRO_ROUNDS - 2.5)) {
+    rightHalf.scrollTop -= round;
   }
-  lastWheel = event.timeStamp;
-  if (!scrollStartedAtEnd) return;
+}, { passive: true });
 
-  pushed += event.deltaY;
-  const list = [...projectButtons];
-  const index = list.indexOf(open);
-  if (pushed > SCROLL_PUSH && list[index + 1]) {
-    scrollStartedAtEnd = false; // one move per scroll
-    openProject(list[index + 1]);
-  } else if (pushed < -SCROLL_PUSH && list[index - 1]) {
-    scrollStartedAtEnd = false;
-    openProject(list[index - 1], true);
+// The carousel starts on its second round, so it can be scrolled up too
+window.addEventListener("load", () => {
+  if (intro.classList.contains("is-open")) {
+    rightHalf.scrollTop = introRoundHeight();
+  }
+});
+
+rightHalf.addEventListener("scroll", () => {
+  if (phone.matches || performance.now() < autoScrollUntil) return;
+  if (!cases.some((images) => images.classList.contains("is-open"))) return;
+
+  // The project whose images are in the middle of the right half (at the very end: the last one)
+  const atBottom = rightHalf.scrollTop + rightHalf.clientHeight >= rightHalf.scrollHeight - 1;
+  const middle = rightHalf.scrollTop + rightHalf.clientHeight / 2;
+  const shown = cases.filter((images) => images.classList.contains("is-open"));
+  const current = atBottom
+    ? shown[shown.length - 1]
+    : shown.filter((images) => images.offsetTop <= middle).pop() || shown[0];
+  if (!current) return;
+
+  const button = document.querySelector(`[aria-controls="${current.id}"]`);
+  if (button !== scrollProject) {
+    // The open text closes, and the line under the next project curls once where it is.
+    // Only then its text opens, so the wave stays on that one line
+    markOpenProject(null);
+    scrollProject = button;
+    const project = button.closest(".project");
+    project.scrollIntoView({ block: "nearest", behavior: "smooth" });
+    project.waveOnce();
+    waitingToOpen = setTimeout(() => markOpenProject(button), cssNumber("--wave-time") * 1000);
   }
 }, { passive: true });
 
@@ -185,6 +278,10 @@ nameButton.addEventListener("click", () => {
   document.querySelectorAll(".pane").forEach((pane) => {
     pane.scrollTop = 0;
   });
+  if (!intro.classList.contains("is-open")) {
+    showIntro();
+  }
+  rightHalf.scrollTop = introRoundHeight(); // the carousel starts on its second round
 });
 
 // ===== Wavy lines on hover =====
@@ -303,6 +400,15 @@ function addWave({ owner, trigger, svgClass, vertical, restColor, canWave = () =
     hovering = false;
   });
 
+  // A wave once, without the mouse (when the scroll moves on to the next project):
+  // the line curls from one end to the other, then stretches back
+  owner.waveOnce = () => {
+    start();
+    setTimeout(() => {
+      if (!mouseInside) hovering = false;
+    }, cssNumber("--wave-time") * 1000);
+  };
+
   // A click can open a spine label: then its straight red line takes over at once
   trigger.addEventListener("click", () => {
     if (!canWave()) {
@@ -335,6 +441,54 @@ document.querySelectorAll(".side-label").forEach((label) => {
     vertical: () => !phone.matches,
     restColor: "transparent",
     canWave: () => !label.classList.contains("is-active"),
+  });
+});
+
+// ===== Contact details: hover and copy (computer) =====
+// Clicking a contact detail copies it, instead of opening the mail, Instagram or phone app.
+// It then says "copied" with a straight red underline, until the mouse moves off it.
+// (This click listener comes before addWave's, so the wave stops at once when it is copied.)
+function copyText(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text);
+  }
+  // Older way, for a page opened without https (like on the local network)
+  const field = document.createElement("textarea");
+  field.value = text;
+  document.body.appendChild(field);
+  field.select();
+  document.execCommand("copy");
+  field.remove();
+  return Promise.resolve();
+}
+
+document.querySelectorAll(".contact-link").forEach((link) => {
+  // The words go in their own span, so changing them leaves the wave drawing in place
+  const text = link.textContent;
+  const words = document.createElement("span");
+  words.textContent = text;
+  link.replaceChildren(words);
+
+  link.addEventListener("click", (event) => {
+    if (phone.matches) return; // a phone opens the app as usual
+    event.preventDefault();
+    copyText(text);
+    words.textContent = "copied";
+    link.classList.add("is-copied");
+  });
+
+  link.addEventListener("pointerleave", () => {
+    words.textContent = text;
+    link.classList.remove("is-copied");
+  });
+
+  addWave({
+    owner: link,
+    trigger: link,
+    svgClass: "contact-wave",
+    vertical: () => false,
+    restColor: "transparent",
+    canWave: () => !link.classList.contains("is-copied"),
   });
 });
 
@@ -482,12 +636,87 @@ document.querySelectorAll(".case").forEach((images) => {
       number.classList.add("case-number--poster");
     } else if (image.classList.contains("case-image--portrait")) {
       number.classList.add("case-number--portrait");
-      const setRatio = () => number.style.setProperty("--ratio", image.naturalWidth / image.naturalHeight);
-      if (image.complete) setRatio();
-      image.addEventListener("load", setRatio);
+      // A standing video knows its size once its first details have loaded
+      const isVideo = image.tagName === "VIDEO";
+      const setRatio = () => number.style.setProperty("--ratio", isVideo
+        ? image.videoWidth / image.videoHeight
+        : image.naturalWidth / image.naturalHeight);
+      if (isVideo ? image.readyState >= 1 : image.complete) setRatio();
+      image.addEventListener(isVideo ? "loadedmetadata" : "load", setRatio);
     }
   });
 });
+
+// ===== Magnifying square on the project images (computer) =====
+// Pressing the mouse on a project image grows the square cursor into a big square
+// that shows the image up close, under the mouse. Letting go brings back the small cursor.
+// Inside the square is a copy of the image, made bigger and moved so the point
+// under the mouse stays in the middle of the square.
+const lens = document.createElement("div");
+lens.className = "zoom-lens";
+lens.setAttribute("aria-hidden", "true");
+document.body.appendChild(lens);
+
+let zoomed = null; // the image being looked at, and its copy inside the square
+let lastPointer = { x: 0, y: 0 };
+
+function moveLens() {
+  if (!zoomed) return;
+  const size = cssNumber("--lens-size");
+  const zoom = cssNumber("--lens-zoom");
+  const box = zoomed.item.getBoundingClientRect();
+  const x = lastPointer.x - box.left; // the point under the mouse, inside the image
+  const y = lastPointer.y - box.top;
+  lens.style.left = `${lastPointer.x - size / 2}px`;
+  lens.style.top = `${lastPointer.y - size / 2}px`;
+  zoomed.copy.style.transform = `translate(${size / 2 - x * zoom}px, ${size / 2 - y * zoom}px) scale(${zoom})`;
+}
+
+function stopZoom() {
+  if (!zoomed) return;
+  zoomed = null;
+  lens.replaceChildren();
+  lens.classList.remove("is-shown");
+  root.classList.remove("is-zooming");
+}
+
+rightHalf.addEventListener("pointerdown", (event) => {
+  if (phone.matches || event.pointerType !== "mouse" || event.button !== 0) return;
+  // An image (or a framed photo) of a project. Not the numbers, and not the videos
+  const item = event.target.closest(".case > :not(.case-number):not(video)");
+  if (!item) return;
+  event.preventDefault(); // don't start dragging the image
+
+  // A copy of the image at its size on the page; moveLens makes it bigger
+  const box = item.getBoundingClientRect();
+  const copy = item.cloneNode(true);
+  Object.assign(copy.style, {
+    position: "absolute",
+    left: "0",
+    top: "0",
+    margin: "0",
+    width: `${box.width}px`,
+    height: `${box.height}px`,
+    maxWidth: "none",
+    maxHeight: "none",
+    transformOrigin: "0 0",
+  });
+  lens.replaceChildren(copy);
+  zoomed = { item, copy };
+  lastPointer = { x: event.clientX, y: event.clientY };
+  moveLens();
+  lens.classList.add("is-shown");
+  root.classList.add("is-zooming");
+});
+
+window.addEventListener("pointermove", (event) => {
+  lastPointer = { x: event.clientX, y: event.clientY };
+  moveLens();
+});
+rightHalf.addEventListener("scroll", moveLens, { passive: true }); // scrolling while pressing
+window.addEventListener("pointerup", stopZoom);
+window.addEventListener("pointercancel", stopZoom);
+window.addEventListener("blur", stopZoom);
 
 // ===== No zooming with the mouse or the trackpad =====
 // Ctrl + scroll wheel, and a pinch on a trackpad (which the browser reports the same way),

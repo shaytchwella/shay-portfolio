@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Shay Tchwella — Portfolio</title>
-  <link rel="stylesheet" href="styles.css?v=revert17">
-  <script src="script.js?v=revert17" defer></script>
+  <link rel="stylesheet" href="styles.css?v=contact45">
+  <script src="script.js?v=contact45" defer></script>
 </head>
 <body>
   <main class="page">
@@ -42,7 +42,11 @@
             </div>
           </li>
           <li class="project">
-            <span class="project-name"><span class="project-number">2</span>Brutality, Revival and Her Name Is Miar</span>
+            <button class="project-name project-toggle" type="button" aria-expanded="false" aria-controls="case-miar"><span class="project-number">2</span>Brutality, Revival and Her Name Is Miar</button>
+            <!-- The description is still to come -->
+            <div class="project-details">
+              <div class="project-details-inner"></div>
+            </div>
           </li>
           <li class="project">
             <button class="project-name project-toggle" type="button" aria-expanded="false" aria-controls="case-jericho"><span class="project-number">3</span>Jericho First</button>
@@ -76,7 +80,11 @@
             </div>
           </li>
           <li class="project">
-            <span class="project-name"><span class="project-number">5</span>Barricades</span>
+            <button class="project-name project-toggle" type="button" aria-expanded="false" aria-controls="case-davar"><span class="project-number">5</span>Davar Newspaper</button>
+            <!-- No description yet: opening it shows only the video and the photos -->
+            <div class="project-details">
+              <div class="project-details-inner"></div>
+            </div>
           </li>
           <li class="project">
             <button class="project-name project-toggle" type="button" aria-expanded="false" aria-controls="case-illustrations"><span class="project-number">6</span>Illustrations</button>
@@ -102,9 +110,9 @@
         </p>
 
         <address class="contact">
-          <a href="mailto:shay.tchwella@gmail.com">shay.tchwella@gmail.com</a><br>
-          <a href="https://www.instagram.com/shay_tchwella/" target="_blank" rel="noopener">@shay_tchwella</a><br>
-          <a href="tel:+972549809026">+972 54 980 9026</a>
+          <a class="contact-link" href="mailto:shay.tchwella@gmail.com">shay.tchwella@gmail.com</a><br>
+          <a class="contact-link" href="https://www.instagram.com/shay_tchwella/" target="_blank" rel="noopener">@shay_tchwella</a><br>
+          <a class="contact-link" href="tel:+972549809026">+972 54 980 9026</a>
         </address>
       </div>
 
@@ -122,6 +130,20 @@
 
     <!-- Right half: scrolls on its own, only when its content is taller than the screen -->
     <div class="pane pane--right">
+
+      <!-- Opening screen: a column of chosen images on the right margin.
+           script.js repeats it, so the scroll goes round and round like a carousel -->
+      <section class="intro is-shown is-open" id="intro" aria-label="Selected work">
+        <div class="intro-set">
+          <img src="images/intro-1.jpg" alt="">
+          <img src="images/intro-2.jpg" alt="">
+          <img src="images/intro-3.jpg" alt="">
+          <img class="intro-narrow" src="images/intro-4.jpg" alt="">
+          <img class="intro-narrow" src="images/intro-5.jpg" alt="">
+          <img src="images/intro-6.jpg" alt="">
+          <img src="images/intro-7.jpg" alt="">
+        </div>
+      </section>
 
       <!-- Index: grid of images, opens when INDEX is clicked -->
       <section class="index-grid" id="index-grid" aria-label="Index">
@@ -185,6 +207,11 @@
         <figure class="index-item">
           <figcaption>1.15</figcaption>
           <img src="images/index-1-15.jpg" alt="">
+        </figure>
+        <!-- 2: Brutality, Revival and Her Name Is Miar (2.01 is a frame of the booklet video) -->
+        <figure class="index-item">
+          <figcaption>2.01</figcaption>
+          <img src="images/index-2-01.jpg" alt="">
         </figure>
         <!-- 3: Jericho First (3.01 is the cover of the booklet video) -->
         <figure class="index-item">
@@ -272,6 +299,23 @@
           <figcaption>4.07</figcaption>
           <img src="images/index-4-07.jpg" alt="">
         </figure>
+        <!-- 5: Davar Newspaper -->
+        <figure class="index-item">
+          <figcaption>5.01</figcaption>
+          <img src="images/index-5-01.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>5.02</figcaption>
+          <img src="images/index-5-02.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>5.03</figcaption>
+          <img src="images/index-5-03.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>5.04</figcaption>
+          <img src="images/index-5-04.jpg" alt="">
+        </figure>
         <!-- 6: Illustrations -->
         <figure class="index-item">
           <figcaption>6.01</figcaption>
@@ -279,11 +323,29 @@
         </figure>
         <figure class="index-item">
           <figcaption>6.02</figcaption>
+          <img src="images/index-6-butcher.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>6.03</figcaption>
           <img src="images/index-6-02.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>6.04</figcaption>
+          <img src="images/index-6-gerbil-1.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>6.05</figcaption>
+          <img src="images/index-6-gerbil-5.jpg" alt="">
+        </figure>
+        <figure class="index-item">
+          <figcaption>6.06</figcaption>
+          <img src="images/index-6-gerbil-4.jpg" alt="">
         </figure>
       </section>
 
-      <!-- Case study: Bezalel Graduation Exhibition. Opens after its text in the table -->
+      <!-- Case studies, in the order of the table. On a computer they come one after the other,
+           so scrolling past the last image of a project goes straight on to the next one -->
+      <!-- Case study: Bezalel Graduation Exhibition -->
       <section class="case" id="case-bezalel" aria-label="Bezalel Graduation Exhibition">
         <img class="case-image" src="images/bezalel-01.jpg" alt="">
         <img class="case-image" src="images/bezalel-02.jpg" alt="">
@@ -302,17 +364,10 @@
         <img class="case-image" src="images/bezalel-15.jpg" alt="">
       </section>
 
-      <!-- Case study: SUM Chocolad. Opens after its text in the table -->
-      <section class="case" id="case-sum" aria-label="SUM Chocolad">
-        <img class="case-image" src="images/sum-01.jpg" alt="">
-        <img class="case-image" src="images/sum-02.jpg" alt="">
-        <img class="case-image" src="images/sum-03.jpg" alt="">
-        <img class="case-image" src="images/sum-04.jpg" alt="">
-        <img class="case-image" src="images/sum-05.jpg" alt="">
-        <!-- Leaflet -->
-        <img class="case-image" src="images/sum-leaflet.jpg" alt="">
-        <!-- Poster -->
-        <img class="case-image case-image--portrait" src="images/sum-poster.jpg" alt="">
+      <!-- Brutality, Revival and Her Name Is Miar. More images to come after the video.
+           The video file has black bars on both sides: its frame hides exactly them -->
+      <section class="case" id="case-miar" aria-label="Brutality, Revival and Her Name Is Miar">
+        <video class="case-video case-video--miar" src="images/miar-booklet-video.mp4" autoplay muted loop playsinline></video>
       </section>
 
       <!-- Case study: Jericho First. Opens after its text in the table -->
@@ -365,10 +420,37 @@
         <img class="case-screen" src="images/jericho-website-6.jpg" alt="" style="--box: 669 / 432;">
       </section>
 
-      <!-- Illustrations: two standing drawings -->
+      <!-- Case study: SUM Chocolad. Opens after its text in the table -->
+      <section class="case" id="case-sum" aria-label="SUM Chocolad">
+        <img class="case-image" src="images/sum-01.jpg" alt="">
+        <img class="case-image" src="images/sum-02.jpg" alt="">
+        <img class="case-image" src="images/sum-03.jpg" alt="">
+        <img class="case-image" src="images/sum-04.jpg" alt="">
+        <img class="case-image" src="images/sum-05.jpg" alt="">
+        <!-- Leaflet -->
+        <img class="case-image" src="images/sum-leaflet.jpg" alt="">
+        <!-- Poster -->
+        <img class="case-image case-image--portrait" src="images/sum-poster.jpg" alt="">
+      </section>
+
+      <!-- Case study: Davar Newspaper. A standing video, then three standing photos -->
+      <section class="case" id="case-davar" aria-label="Davar Newspaper">
+        <video class="case-video case-video--standing case-image--portrait" src="images/davar-video.mp4" autoplay muted loop playsinline></video>
+        <img class="case-image case-image--portrait" src="images/davar-01.jpg" alt="">
+        <img class="case-image case-image--portrait" src="images/davar-02.jpg" alt="">
+        <img class="case-image case-image--portrait" src="images/davar-03.jpg" alt="">
+      </section>
+
+      <!-- Illustrations: drawings -->
       <section class="case" id="case-illustrations" aria-label="Illustrations">
         <img class="case-image case-image--portrait" src="images/illustrations-01.jpg" alt="">
+        <!-- A butcher and his two sisters -->
+        <img class="case-image" src="images/illustrations-butcher.jpg" alt="">
         <img class="case-image case-image--portrait" src="images/illustrations-02.jpg" alt="">
+        <!-- Gerbil seeks socks: three long strips -->
+        <img class="case-image" src="images/illustrations-gerbil-1.jpg" alt="">
+        <img class="case-image" src="images/illustrations-gerbil-5.jpg" alt="">
+        <img class="case-image" src="images/illustrations-gerbil-4.jpg" alt="">
       </section>
 
     </div>
